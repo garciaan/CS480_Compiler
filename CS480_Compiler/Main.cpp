@@ -10,6 +10,7 @@ using namespace std;
 
 int main(int argc, char** argv)
 {
+
 	//Current usage: 1 source file
 	if (argc != 2){
 		cout << "Error : usage \"compiler filename\"" << endl;
@@ -57,6 +58,10 @@ int main(int argc, char** argv)
 
 			} while (isalpha(c) || isdigit(c) || c == '_');
 
+			//here we have gone one over, so we will place the character back onto the stream
+
+			source_file.putback(c);
+
 			StrToken token = StrToken("id", value);
 			token.print();
 
@@ -94,6 +99,18 @@ int main(int argc, char** argv)
 
 			}
 
+			//here we have gone one over, so we will place the character back onto the stream
+
+			source_file.putback(c);
+
+
+			//remove e or E if no numbers are found
+			//we actually might want to report invaild lexeme here
+			if (value[value.length() - 1] == 'e' || value[value.length() - 1] == 'E'){
+				value.erase(value.length() - 1, 1);
+			}
+
+
 			if (value.find(".") != string::npos ||
 				value.find("e") != string::npos ||
 				value.find("E") != string::npos){
@@ -124,6 +141,7 @@ int main(int argc, char** argv)
 		}
 		else {
 
+			//ugly, fix later
 			Token token;
 			switch (c)
 			{
@@ -157,10 +175,12 @@ int main(int argc, char** argv)
 				token.print();
 				break;
 			case '<':
+				//add <= here
 				token.setTag("<");
 				token.print();
 				break;
 			case '>':
+				//add >= here
 				token.setTag(">");
 				token.print();
 				break;
@@ -172,6 +192,12 @@ int main(int argc, char** argv)
 				token.setTag("^");
 				token.print();
 				break;
+			//non-standard comment 
+			case '#':
+				//eat the comment line
+				do{
+					source_file >> c;
+				} while (c != '\n');
 
 			default:
 				break;
