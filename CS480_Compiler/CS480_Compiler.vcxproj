@@ -64,10 +64,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Lex.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Token.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Lex.h" />
     <ClInclude Include="Token.h" />
   </ItemGroup>
   <ItemGroup>

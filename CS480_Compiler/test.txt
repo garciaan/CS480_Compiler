@@ -1,2 +1,4 @@
-#Test Case 1
+#Test Case 1. these should come out the same
 [3 + 3]
+[3+3]
+[:= var]
