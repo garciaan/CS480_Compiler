@@ -18,7 +18,8 @@ void tokenize(istream &source, std::queue<Token*> &queue, SymbolTable &table, st
 		//value is used to hold itermediate lexme values. Cleared after every run.
 		value = "";
 
-		//read a chacter
+		//read a chacter, but eat any white space since going through with these characters
+		//will just be a waste of time
 		do{
 			source >> c;
 		} while (c == ' ' || c == '\t');
@@ -55,14 +56,17 @@ void tokenize(istream &source, std::queue<Token*> &queue, SymbolTable &table, st
 		}
 
 		//numbers
-		else if (isdigit(c)){
+		else if (isdigit(c) || c == '.'){
 
-			//while we have just digits get the digits
-			do{
-				value.append(1, c);
-				source >> c;
 
-			} while (isdigit(c));
+			//while we have just digits, get the digits
+			if (isdigit(c)){
+				do{
+					value.append(1, c);
+					source >> c;
+
+				} while (isdigit(c));
+			}
 
 			//if either our first character is a . or we got a . while
 			//processing the above, add it and start looking for digits again
@@ -76,13 +80,26 @@ void tokenize(istream &source, std::queue<Token*> &queue, SymbolTable &table, st
 
 			}
 
+			//do the same as above
 			if (c == 'e' || c == 'E'){
 
-				do{
+				//normally we take in '-' as tokens and let the semantics sort it
+				//out. This is the one exception, since 3.45e-3 will not be handled 
+				//correctly if we do not
+				value.append(1, c);
+				source >> c;
+
+				//we will take one and exactly one minus symbol
+				if (c == '-'){
 					value.append(1, c);
 					source >> c;
+				}
 
-				} while (isdigit(c));
+				while (isdigit(c)){
+					value.append(1, c);
+					source >> c;
+				}
+
 
 			}
 
@@ -90,12 +107,11 @@ void tokenize(istream &source, std::queue<Token*> &queue, SymbolTable &table, st
 
 			source.putback(c);
 
-
 			//remove e or E if no numbers are found
 			//we actually might want to report invaild lexeme here
 			if (value[value.length() - 1] == 'e' || value[value.length() - 1] == 'E'){
 				
-
+				//create warning message and fix syntax
 				lex_mesg warning;
 				warning.line = line_num;
 				std::ostringstream str;
