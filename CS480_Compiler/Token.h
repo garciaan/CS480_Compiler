@@ -75,6 +75,16 @@ public:
 	void print();
 };
 
+class IdToken : public Token
+{
+	std::string value;
+
+public:
+	IdToken(std::string _str);
+	void print();
+};
+
+
 class IntToken : public Token
 {
 	int value;

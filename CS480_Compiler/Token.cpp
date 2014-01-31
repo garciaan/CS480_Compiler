@@ -40,7 +40,8 @@ Meanings[] =
 	{ ID, "ID" },
 	{ INT_L, "INT_L" },
 	{ REAL_L, "REAL_L" },
-	{ STRING_L, "STRING_L" }
+	{ STRING_L, "STRING_L" },
+	{ LINE_END, "LINE_END" }
 };
 
 std::string Token::tag_to_string(int tag){
@@ -73,6 +74,12 @@ void Token::set_tag(int _tag){
 StrToken::StrToken(std::string _str) : Token(STRING_L), value(_str){}
 
 void StrToken::print(){
+	std::cout << "<" << tag_to_string(tag) << ", " << value << ">";
+}
+
+IdToken::IdToken(std::string _str) : Token(ID), value(_str){}
+
+void IdToken::print(){
 	std::cout << "<" << tag_to_string(tag) << ", " << value << ">";
 }
 

@@ -20,9 +20,22 @@ int main(int argc, char** argv)
 		return -2;
 	}
 
+	//setup symbol table
+	std::string inital_syms[] = {"true", "false", "and", "or", "not", "bool",
+		"int", "real", "string", "let", "if", "while", "sin", "cos", "tan",
+		"stdout"
+	};
+
+	int inital_values[] = { TRUE, FALSE, AND, OR, NOT, BOOL_T, INT_T, REAL_T,
+		STRING_T, LET, IF, WHILE, ST_ID, ST_ID, ST_ID, ST_ID };
+
+	int n = sizeof(inital_values) / sizeof(int);
+
+	SymbolTable table = SymbolTable(inital_syms, inital_values, n);
+
 	std::queue<Token*> tokens;
 
-	tokenize(source_file, tokens);
+	tokenize(source_file, tokens, table);
 
 	Token *token;
 	while (!tokens.empty()){

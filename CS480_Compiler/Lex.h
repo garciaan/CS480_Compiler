@@ -10,8 +10,8 @@
 #include <queue>
 
 #include "Token.h"
+#include "SymbolTable.h"
 
-void tokenize(std::istream &source_file, std::queue<Token*> &queue);
-
+void tokenize(std::istream &source_file, std::queue<Token*> &queue, SymbolTable &table);
 
 #endif //LEX_H

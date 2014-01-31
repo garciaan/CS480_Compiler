@@ -3,7 +3,7 @@
 
 using namespace std;
 
-void tokenize(istream &source_file, std::queue<Token*> &queue){
+void tokenize(istream &source_file, std::queue<Token*> &queue, SymbolTable &table){
 
 	int line_num = 0;
 
@@ -40,7 +40,14 @@ void tokenize(istream &source_file, std::queue<Token*> &queue){
 
 			source_file.putback(c);
 
-			queue.push(new StrToken(value));
+			int attempt = table.insert_symbol(value);
+
+			if (attempt < 0){
+				queue.push(new IdToken(value));
+			}
+			else {
+				queue.push(new Token(attempt));
+			}
 
 		}
 
