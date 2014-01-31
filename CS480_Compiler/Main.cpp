@@ -34,8 +34,12 @@ int main(int argc, char** argv)
 	SymbolTable table = SymbolTable(inital_syms, inital_values, n);
 
 	std::queue<Token*> tokens;
+	std::queue<lex_mesg> errors;
+	std::queue<lex_mesg> warnings;
 
-	tokenize(source_file, tokens, table);
+	tokenize(source_file, tokens, table, errors, warnings);
+
+	std::cout << std::endl << "Tokens:" << std::endl;
 
 	Token *token;
 	while (!tokens.empty()){
@@ -43,6 +47,26 @@ int main(int argc, char** argv)
 		tokens.pop();
 		token->print();
 		free(token);
+	}
+
+	std::cout << "\n\n" << "Errors:" << std::endl;
+
+	lex_mesg error;
+	while (!errors.empty()){
+		error = errors.front();
+		errors.pop();
+		std::cout << error.msg << std::endl;
+
+	}
+
+	std::cout << "\n\n" << "Warnings:" << std::endl;
+
+	lex_mesg warning;
+	while (!warnings.empty()){
+		warning = warnings.front();
+		warnings.pop();
+		std::cout << warning.msg << std::endl;
+
 	}
 
 	return 0;

@@ -3,9 +3,9 @@
 
 using namespace std;
 
-void tokenize(istream &source_file, std::queue<Token*> &queue, SymbolTable &table){
+void tokenize(istream &source, std::queue<Token*> &queue, SymbolTable &table, std::queue<lex_mesg> &errors, std::queue<lex_mesg> &warnings){
 
-	int line_num = 0;
+	int line_num = 1;
 
 	char c;
 	string value;
@@ -19,10 +19,13 @@ void tokenize(istream &source_file, std::queue<Token*> &queue, SymbolTable &tabl
 		value = "";
 
 		//read a chacter
-		source_file >> c;
+		do{
+			source >> c;
+		} while (c == ' ' || c == '\t');
+		
 
 		//if we hit the end of the file we are done here
-		if (source_file.eof()){
+		if (source.eof()){
 			break;
 		}
 
@@ -32,13 +35,13 @@ void tokenize(istream &source_file, std::queue<Token*> &queue, SymbolTable &tabl
 
 			do{
 				value.append(1, c);
-				source_file >> c;
+				source >> c;
 
 			} while (isalpha(c) || isdigit(c) || c == '_');
 
 			//here we have gone one over, so we will place the character back onto the stream
 
-			source_file.putback(c);
+			source.putback(c);
 
 			int attempt = table.insert_symbol(value);
 
@@ -57,7 +60,7 @@ void tokenize(istream &source_file, std::queue<Token*> &queue, SymbolTable &tabl
 			//while we have just digits get the digits
 			do{
 				value.append(1, c);
-				source_file >> c;
+				source >> c;
 
 			} while (isdigit(c));
 
@@ -67,7 +70,7 @@ void tokenize(istream &source_file, std::queue<Token*> &queue, SymbolTable &tabl
 
 				do{
 					value.append(1, c);
-					source_file >> c;
+					source >> c;
 
 				} while (isdigit(c));
 
@@ -77,7 +80,7 @@ void tokenize(istream &source_file, std::queue<Token*> &queue, SymbolTable &tabl
 
 				do{
 					value.append(1, c);
-					source_file >> c;
+					source >> c;
 
 				} while (isdigit(c));
 
@@ -85,13 +88,23 @@ void tokenize(istream &source_file, std::queue<Token*> &queue, SymbolTable &tabl
 
 			//here we have gone one over, so we will place the character back onto the stream
 
-			source_file.putback(c);
+			source.putback(c);
 
 
 			//remove e or E if no numbers are found
 			//we actually might want to report invaild lexeme here
 			if (value[value.length() - 1] == 'e' || value[value.length() - 1] == 'E'){
-				value.erase(value.length() - 1, 1);
+				
+
+				lex_mesg warning;
+				warning.line = line_num;
+				std::ostringstream str;
+				str << "'" << value << "' on line " << line_num << ". Digit must follow e. Appending 0.";
+				warning.msg = str.str();
+				warnings.push(warning);
+
+				value.append(1, '0');
+
 			}
 
 
@@ -109,10 +122,10 @@ void tokenize(istream &source_file, std::queue<Token*> &queue, SymbolTable &tabl
 		else if (c == '"'){
 
 			//eat the leading "
-			source_file >> c;
+			source >> c;
 			do{
 				value.append(1, c);
-				source_file >> c;
+				source >> c;
 
 			} while (c != '"' || (c == '"' && value.back() == '\\'));
 
@@ -153,18 +166,18 @@ void tokenize(istream &source_file, std::queue<Token*> &queue, SymbolTable &tabl
 				}
 				else{
 					queue.push(new Token(LT));
-					source_file.putback(c);
+					source.putback(c);
 				}
 				
 				break;
 			case '>':
-				source_file >> c;
+				source >> c;
 				if (c == '='){
 					queue.push(new Token(GE));
 				}
 				else{
 					queue.push(new Token(GT));
-					source_file.putback(c);
+					source.putback(c);
 				}
 				
 				break;
@@ -177,37 +190,51 @@ void tokenize(istream &source_file, std::queue<Token*> &queue, SymbolTable &tabl
 				
 				break;
 			case ':':
-				source_file >> c;
+				source >> c;
 				if (c == '='){
 					queue.push(new Token(ASSIGN));
 					
 				}
 				else {
-					source_file.putback(c);
+					source.putback(c);
 				}
 				break;
 			case '!':
-				source_file >> c;
+				source >> c;
 				if (c == '='){
 					queue.push(new Token(ASSIGN));
 					
 				}
 				else {
-					source_file.putback(c);
+					source.putback(c);
 				}
 				break;
 				//non-standard comment 
 			case '#':
 				//eat the comment line
 				do{
-					source_file >> c;
+					source >> c;
 				} while (c != '\n');
+
+				line_num++;
 				break;
 			case '\n':
-				queue.push(new LineToken(++line_num));
+				queue.push(new LineToken(line_num++));
 				
 				break;
+			case ' ':
+				break;
+
 			default:
+				lex_mesg error;
+				error.line = line_num;
+				std::ostringstream str;
+				str << "Unparasable symbol '" << c << "' on line " 
+					<< line_num << ".";
+				error.msg = str.str();
+
+				errors.push(error);
+					
 				break;
 			}
 		}

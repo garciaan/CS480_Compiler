@@ -8,10 +8,17 @@
 #include <cctype>
 #include <string>
 #include <queue>
+#include <sstream>
 
 #include "Token.h"
 #include "SymbolTable.h"
 
-void tokenize(std::istream &source_file, std::queue<Token*> &queue, SymbolTable &table);
+struct _lex_mesg{
+	int line;
+	std::string msg;
+} typedef lex_mesg;
+
+
+void tokenize(std::istream &source, std::queue<Token*> &queue, SymbolTable &table, std::queue<lex_mesg> &errors, std::queue<lex_mesg> &warnings);
 
 #endif //LEX_H

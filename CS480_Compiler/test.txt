@@ -5,3 +5,8 @@
 
 
 [if var [stdout 3]]
+
+#Garbage line
+@@@@
+
+[3.9e]
