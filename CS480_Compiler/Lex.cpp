@@ -143,7 +143,7 @@ void tokenize(istream &source, std::queue<Token*> &queue, SymbolTable &table, st
 				value.append(1, c);
 				source >> c;
 
-			} while (c != '"' || (c == '"' && value.back() == '\\'));
+			} while (c != '"' || (c == '"' && value[value.length() - 1] == '\\'));
 
 			queue.push(new StrToken(value));
 
@@ -177,6 +177,7 @@ void tokenize(istream &source, std::queue<Token*> &queue, SymbolTable &table, st
 				queue.push(new Token(EQ));
 				break;
 			case '<':
+				source >> c;
 				if (c == '='){
 					queue.push(new Token(LE));
 				}
@@ -218,7 +219,7 @@ void tokenize(istream &source, std::queue<Token*> &queue, SymbolTable &table, st
 			case '!':
 				source >> c;
 				if (c == '='){
-					queue.push(new Token(ASSIGN));
+					queue.push(new Token(NE));
 					
 				}
 				else {
