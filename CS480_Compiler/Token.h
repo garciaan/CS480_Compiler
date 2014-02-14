@@ -9,6 +9,7 @@
 
 
 //tag values
+//Terminal symbols go from 1 to 199
 #define AND 1
 #define OR 2
 #define TRUE 3
@@ -41,6 +42,20 @@
 #define REAL_L 30
 #define STRING_L 31
 
+//Non-Terminal Symbols
+//These start at 200 and go through 399
+
+//Start Non-Terminal
+#define NON_START 200
+//S Non-Terminal
+#define NON_S 201
+#define NON_S_1 202
+#define NON_S_2 203
+
+#define EMPTY 299
+
+
+#define INPUT_END 333
 
 #define LINE_END 999
 
@@ -112,6 +127,10 @@ public:
 	LineToken(int _line);
 	void print();
 };
+
+
+bool is_terminal(Token token);
+bool is_non_terminal(Token token);
 
 
 #endif //TOKEN_H

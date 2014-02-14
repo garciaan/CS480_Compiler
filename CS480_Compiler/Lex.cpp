@@ -219,7 +219,7 @@ void tokenize(istream &source, std::queue<Token*> &queue, SymbolTable &table, st
 				line_num++;
 				break;
 			case '\n':
-				queue.push(new LineToken(line_num++));
+				//queue.push(new LineToken(line_num++));
 				
 				break;
 			case ' ':

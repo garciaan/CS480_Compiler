@@ -41,7 +41,13 @@ Meanings[] =
 	{ INT_L, "INT_L" },
 	{ REAL_L, "REAL_L" },
 	{ STRING_L, "STRING_L" },
-	{ LINE_END, "LINE_END" }
+	{ LINE_END, "LINE_END" },
+	{ INPUT_END, "INPUT_END" },
+	{ NON_START, "START" },
+	{ NON_S, "S" },
+	{ NON_S_1, "S_1" },
+	{ NON_S_2, "S_2" },
+	{ EMPTY, "EMPTY" }
 };
 
 std::string Token::tag_to_string(int tag){
@@ -108,4 +114,18 @@ LineToken::LineToken(int _line) : Token(LINE_END)
 
 void LineToken::print(){
 	std::cout << std::endl;
+}
+
+bool is_non_terminal(Token token){
+	if (token.get_tag() >= 200 && token.get_tag() < 400){
+		return true;
+	}
+	return false;
+}
+
+bool is_terminal(Token token){
+	if (token.get_tag() > 0 && token.get_tag() < 200){
+		return true;
+	}
+	return false;
 }

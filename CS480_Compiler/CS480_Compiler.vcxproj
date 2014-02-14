@@ -66,15 +66,18 @@
   <ItemGroup>
     <ClCompile Include="Lex.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="Parser.cpp" />
     <ClCompile Include="SymbolTable.cpp" />
     <ClCompile Include="Token.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Lex.h" />
+    <ClInclude Include="Parser.h" />
     <ClInclude Include="SymbolTable.h" />
     <ClInclude Include="Token.h" />
   </ItemGroup>
   <ItemGroup>
+    <Text Include="parse_test_L1.txt" />
     <Text Include="test.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
