@@ -30,6 +30,8 @@ void Parser::parse(std::queue<Token*> tokens){
 				}
 			}
 
+			//visualization
+
 			//print stack in reverse order
 			for (std::vector<int>::iterator it = save_stack.begin(); it != save_stack.end(); ++it){
 				std::cout << '<' << Token::tag_to_string(*it) << '>';

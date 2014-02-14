@@ -51,6 +51,22 @@
 #define NON_S 201
 #define NON_S_1 202
 #define NON_S_2 203
+#define NON_EXPR 204
+#define NON_EXPR_1 205
+#define NON_OPER 206
+#define NON_OPER_1 207
+#define NON_STMT 208
+#define NON_STMT_1 209
+#define NON_BINOP 210
+#define NON_UNOP 211
+#define NON_CONST 212
+#define NON_IFSTMT 213
+#define NON_EXPRLIST 214
+#define NON_EXPRLIST_1 215
+#define NON_VARLIST 216
+#define NON_VARLIST_1 217
+#define NON_TYPE 218
+#define NON_NEGOP 219
 
 #define EMPTY 299
 
@@ -78,6 +94,7 @@ public:
 	void set_tag(int _tag);
 
 	static std::string tag_to_string(int tag);
+	static int string_to_tag(std::string word);
 
 };
 
