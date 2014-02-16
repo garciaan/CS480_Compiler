@@ -41,6 +41,10 @@
 #define INT_L 29
 #define REAL_L 30
 #define STRING_L 31
+#define SIN 32
+#define COS 33
+#define TAN 34
+#define STDOUT 35
 
 //Non-Terminal Symbols
 //These start at 200 and go through 399
@@ -95,6 +99,7 @@ public:
 
 	static std::string tag_to_string(int tag);
 	static int string_to_tag(std::string word);
+	static std::string tag_to_input(int tag);
 
 };
 

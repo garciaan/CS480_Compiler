@@ -2,6 +2,7 @@
 
 #include "Parser.h"
 
+
 void Parser::parse(std::queue<Token*> tokens){
 
 	//for our parsing purposes
@@ -34,11 +35,11 @@ void Parser::parse(std::queue<Token*> tokens){
 
 			//print stack in reverse order
 			for (std::vector<int>::iterator it = save_stack.begin(); it != save_stack.end(); ++it){
-				std::cout << '<' << Token::tag_to_string(*it) << '>';
+				std::cout << ' ' << Token::tag_to_input(*it) << ' ';
 			}
 
 			for (std::vector<int>::reverse_iterator it = stack.rbegin(); it != stack.rend(); ++it){
-				std::cout << '<' << Token::tag_to_string(*it) << '>';
+				std::cout << ' ' << Token::tag_to_input(*it) << ' ';
 			}
 			std::cout << std::endl;
 		}

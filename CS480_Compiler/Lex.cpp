@@ -3,7 +3,7 @@
 
 using namespace std;
 
-void tokenize(istream &source, std::queue<Token*> &queue, SymbolTable &table, std::queue<lex_mesg> &errors, std::queue<lex_mesg> &warnings){
+void tokenize(istream &source, std::queue<Token*> &queue, Symbol_Table &table, std::queue<lex_mesg> &errors, std::queue<lex_mesg> &warnings){
 
 	int line_num = 1;
 

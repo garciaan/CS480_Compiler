@@ -67,13 +67,15 @@
     <ClCompile Include="Lex.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Parser.cpp" />
-    <ClCompile Include="SymbolTable.cpp" />
+    <ClCompile Include="Parse_Table.cpp" />
+    <ClCompile Include="Symbol_Table.cpp" />
     <ClCompile Include="Token.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Lex.h" />
     <ClInclude Include="Parser.h" />
-    <ClInclude Include="SymbolTable.h" />
+    <ClInclude Include="Parse_Table.h" />
+    <ClInclude Include="Symbol_Table.h" />
     <ClInclude Include="Token.h" />
   </ItemGroup>
   <ItemGroup>

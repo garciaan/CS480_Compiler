@@ -1,6 +1,6 @@
-#include "SymbolTable.h"
+#include "Symbol_Table.h"
 
-SymbolTable::SymbolTable(std::string *keys, int *values, int n)
+Symbol_Table::Symbol_Table(std::string *keys, int *values, int n)
 {
 
 	for (int i = 0; i < n; ++i){
@@ -10,7 +10,8 @@ SymbolTable::SymbolTable(std::string *keys, int *values, int n)
 
 }
 
-int SymbolTable::_insert_symbol(std::string id, int value)
+
+int Symbol_Table::_insert_symbol(std::string id, int value)
 {
 	Symbol _temp_symbol;
 
@@ -30,7 +31,12 @@ int SymbolTable::_insert_symbol(std::string id, int value)
 
 }
 
-int SymbolTable::insert_symbol(std::string id)
+int Symbol_Table::insert_symbol(std::string id)
 {
 	return _insert_symbol(id, ST_ID);
+}
+
+void create_symbol_table(Symbol_Table &table){
+
+	table = Symbol_Table(inital_syms, inital_values, sizeof(inital_values) / sizeof(int));
 }

@@ -8,24 +8,7 @@
 #include <vector>
 #include "Token.h"
 #include "Lex.h"
-
-typedef struct _map_key{
-	int prod_sym;
-	int in_sym;
-}map_key;
-
-struct map_key_comparer
-{
-	bool operator()(const map_key & Left, const map_key & Right) const
-	{
-		if (Left.prod_sym == Right.prod_sym){
-			return Left.in_sym < Right.in_sym;
-		}
-		else {
-			return Left.prod_sym < Right.prod_sym;
-		}
-	}
-};
+#include "Parse_Table.h"
 
 class Parser
 {

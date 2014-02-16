@@ -11,7 +11,7 @@
 #include <sstream>
 
 #include "Token.h"
-#include "SymbolTable.h"
+#include "Symbol_Table.h"
 
 struct _lex_mesg{
 	int line;
@@ -19,6 +19,6 @@ struct _lex_mesg{
 } typedef lex_mesg;
 
 
-void tokenize(std::istream &source, std::queue<Token*> &queue, SymbolTable &table, std::queue<lex_mesg> &errors, std::queue<lex_mesg> &warnings);
+void tokenize(std::istream &source, std::queue<Token*> &queue, Symbol_Table &table, std::queue<lex_mesg> &errors, std::queue<lex_mesg> &warnings);
 
 #endif //LEX_H
