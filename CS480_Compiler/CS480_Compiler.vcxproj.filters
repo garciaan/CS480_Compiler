@@ -52,10 +52,13 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="test.txt">
+    <Text Include="Pass_Test_1.txt">
       <Filter>Resource Files</Filter>
     </Text>
-    <Text Include="parse_test_L1.txt">
+    <Text Include="Pass_Test_2.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
+    <Text Include="Fail_Test_1.txt">
       <Filter>Resource Files</Filter>
     </Text>
   </ItemGroup>

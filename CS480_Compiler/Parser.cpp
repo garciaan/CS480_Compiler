@@ -3,7 +3,7 @@
 #include "Parser.h"
 
 
-void parse(std::ifstream &source, std::string source_name, Symbol_Table &table, std::map<map_key, std::vector<int>, map_key_comparer> &parse_table){
+void parse(std::ifstream &source, std::string source_name, Symbol_Table &table, std::map<map_key, std::vector<int>, map_key_comparer> &parse_table, bool verbose){
 
 	//setup file stream
 	source >> std::noskipws;
@@ -60,15 +60,19 @@ void parse(std::ifstream &source, std::string source_name, Symbol_Table &table, 
 
 			//visualization
 
-			//print stack in reverse order
-			for (std::vector<int>::iterator it = save_stack.begin(); it != save_stack.end(); ++it){
-				std::cout << ' ' << Token::tag_to_input(*it) << ' ';
-			}
+			if (verbose){
 
-			for (std::vector<int>::reverse_iterator it = stack.rbegin(); it != stack.rend(); ++it){
-				std::cout << ' ' << Token::tag_to_input(*it) << ' ';
+				//print stack in reverse order
+				for (std::vector<int>::iterator it = save_stack.begin(); it != save_stack.end(); ++it){
+					std::cout << ' ' << Token::tag_to_input(*it) << ' ';
+				}
+
+				for (std::vector<int>::reverse_iterator it = stack.rbegin(); it != stack.rend(); ++it){
+					std::cout << ' ' << Token::tag_to_input(*it) << ' ';
+				}
+				std::cout << std::endl;
+
 			}
-			std::cout << std::endl;
 		}
 		else {
 			std::cout << "Error during parsing in " << source_name << " exiting now." << std::endl;
