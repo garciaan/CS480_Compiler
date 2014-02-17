@@ -65,7 +65,7 @@ static std::string parse_table_rules[] = {
 	"NON_EXPR_1:BIN_ALL:NON_OPER_1,",
 	"NON_EXPR_1:MINUS:NON_STMT_1,",
 	"NON_EXPR_1:UN_ALL:NON_OPER_1,",
-	"NON_EXPR_1:STDOUT:NON_STMT_1,",
+	"NON_EXPR_1:STDOUT:NON_S_1,",
 	//Oper Rules 
 	"NON_OPER:L_BRACKET:L_BRACKET,NON_OPER_1,",
 	"NON_OPER:ID:ID,",

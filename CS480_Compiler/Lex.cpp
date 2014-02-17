@@ -7,7 +7,6 @@ void tokenize(istream &source, std::queue<Token*> &queue, Symbol_Table &table, s
 
 	int line_num = 1;
 
-	char c;
 	string value;
 
 	//infinte loop to process each character
@@ -20,9 +19,9 @@ void tokenize(istream &source, std::queue<Token*> &queue, Symbol_Table &table, s
 
 		//read a chacter, but eat any white space since going through with these characters
 		//will just be a waste of time
-		do{
-			source >> c;
-		} while (c == ' ' || c == '\t');
+		while (source.peek() == ' ' || source.peek() == '\t'){
+			source.ignore();
+		}
 		
 
 		//if we hit the end of the file we are done here
@@ -32,18 +31,15 @@ void tokenize(istream &source, std::queue<Token*> &queue, Symbol_Table &table, s
 
 		//ids
 		//we will also check the value here versus our keywords
-		else if (isalpha(c) || c == '_'){
+		else if (isalpha(source.peek()) || source.peek() == '_'){
 
 			do{
-				value.append(1, c);
-				source >> c;
+				value.append(1, source.get());
 
-			} while (isalpha(c) || isdigit(c) || c == '_');
+			} while (isalpha(source.peek()) || isdigit(source.peek()) || source.peek() == '_');
 
-			//here we have gone one over, so we will place the character back onto the stream
-
-			source.putback(c);
-
+			//insert id into symbol table unless we have 
+			//a keyword which we then put into the correct token
 			int attempt = table.insert_symbol(value);
 
 			if (attempt < 0){
@@ -56,56 +52,45 @@ void tokenize(istream &source, std::queue<Token*> &queue, Symbol_Table &table, s
 		}
 
 		//numbers
-		else if (isdigit(c) || c == '.'){
+		else if (isdigit(source.peek()) || source.peek() == '.'){
 
 
 			//while we have just digits, get the digits
-			if (isdigit(c)){
+			if (isdigit(source.peek())){
 				do{
-					value.append(1, c);
-					source >> c;
-
-				} while (isdigit(c));
+					value.append(1, source.get());
+				} while (isdigit(source.peek()));
 			}
 
 			//if either our first character is a . or we got a . while
 			//processing the above, add it and start looking for digits again
-			if (c == '.'){
+			if (source.peek() == '.'){
 
 				do{
-					value.append(1, c);
-					source >> c;
-
-				} while (isdigit(c));
+					value.append(1, source.get());
+				} while (isdigit(source.peek()));
 
 			}
 
 			//do the same as above
-			if (c == 'e' || c == 'E'){
+			if (source.peek() == 'e' || source.peek() == 'E'){
 
 				//normally we take in '-' as tokens and let the semantics sort it
 				//out. This is the one exception, since 3.45e-3 will not be handled 
 				//correctly if we do not
-				value.append(1, c);
-				source >> c;
+				value.append(1, source.get());
 
 				//we will take one and exactly one minus symbol
-				if (c == '-'){
-					value.append(1, c);
-					source >> c;
+				if (source.peek() == '-'){
+					value.append(1, source.get());
 				}
 
-				while (isdigit(c)){
-					value.append(1, c);
-					source >> c;
+				while (isdigit(source.peek())){
+					value.append(1, source.get());
 				}
 
 
 			}
-
-			//here we have gone one over, so we will place the character back onto the stream
-
-			source.putback(c);
 
 			//remove e or E if no numbers are found
 			//we actually might want to report invaild lexeme here
@@ -135,15 +120,14 @@ void tokenize(istream &source, std::queue<Token*> &queue, Symbol_Table &table, s
 
 		}
 		//string literals
-		else if (c == '"'){
+		else if (source.peek() == '"'){
 
 			//eat the leading "
-			source >> c;
-			do{
-				value.append(1, c);
-				source >> c;
-
-			} while (c != '"' || (c == '"' && value[value.length() - 1] == '\\'));
+			source.ignore();
+			while (source.peek() != '"'){
+				value.append(1, source.get());
+			}
+			source.ignore();
 
 			queue.push(new StrToken(value));
 
@@ -152,86 +136,87 @@ void tokenize(istream &source, std::queue<Token*> &queue, Symbol_Table &table, s
 
 			//Match all the little weird symbols. This part is nasty and large
 
-			switch (c)
+			switch (source.peek())
 			{
 
 			case '[':
 				queue.push(new Token(L_BRACKET));
+				source.ignore();
 				break;
 			case ']':
 				queue.push(new Token(R_BRACKET));
+				source.ignore();
 				break;
 			case '+':
 				queue.push(new Token(PLUS));
+				source.ignore();
 				break;
 			case '-':
 				queue.push(new Token(MINUS));
+				source.ignore();
 				break;
 			case '*':
 				queue.push(new Token(MULTI));
+				source.ignore();
 				break;
 			case '/':
 				queue.push(new Token(DIV));
+				source.ignore();
 				break;
 			case '=':
 				queue.push(new Token(EQ));
+				source.ignore();
 				break;
 			case '<':
-				source >> c;
-				if (c == '='){
+				source.ignore();
+				if (source.peek() == '='){
 					queue.push(new Token(LE));
+					source.ignore();
 				}
 				else{
 					queue.push(new Token(LT));
-					source.putback(c);
 				}
 				
 				break;
 			case '>':
-				source >> c;
-				if (c == '='){
+				source.ignore();
+				if (source.peek() == '='){
 					queue.push(new Token(GE));
+					source.ignore();
 				}
 				else{
 					queue.push(new Token(GT));
-					source.putback(c);
 				}
 				
 				break;
 			case '%':
 				queue.push(new Token(MOD));
-				
+				source.ignore();
 				break;
 			case '^':
 				queue.push(new Token(EXP));
-				
+				source.ignore();
 				break;
 			case ':':
-				source >> c;
-				if (c == '='){
+				source.ignore();
+				if (source.peek() == '='){
 					queue.push(new Token(ASSIGN));
-					
-				}
-				else {
-					source.putback(c);
+					source.ignore();
 				}
 				break;
 			case '!':
-				source >> c;
-				if (c == '='){
+				source.ignore();
+				if (source.peek() == '='){
 					queue.push(new Token(NE));
-					
-				}
-				else {
-					source.putback(c);
+					source.ignore();
 				}
 				break;
 				//non-standard comment 
 			case '#':
 				//eat the comment line
 				do{
-					source >> c;
-				} while (c != '\n');
+					source.ignore();
+				} while (source.peek() != '\n');
 
 				line_num++;
 				break;
@@ -246,7 +231,7 @@ void tokenize(istream &source, std::queue<Token*> &queue, Symbol_Table &table, s
 				lex_mesg error;
 				error.line = line_num;
 				std::ostringstream str;
-				str << "Unparasable symbol '" << c << "' on line " 
+				str << "Unparasable symbol '" << source.get() << "' on line " 
 					<< line_num << ".";
 				error.msg = str.str();
 

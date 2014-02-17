@@ -3,7 +3,34 @@
 #include "Parser.h"
 
 
-void Parser::parse(std::queue<Token*> tokens){
+void parse(std::ifstream &source, std::string source_name, Symbol_Table &table, std::map<map_key, std::vector<int>, map_key_comparer> &parse_table){
+
+	//setup file stream
+	source >> std::noskipws;
+
+	//call scanner to create token queue
+	std::queue<Token*> tokens;
+	std::queue<lex_mesg> errors;
+	std::queue<lex_mesg> warnings;
+
+	tokenize(source, tokens, table, errors, warnings);
+
+	//check for errors, abort if we have any
+	if (!errors.empty()){
+		std::cout << "Errors during tokenization, in " << source_name << " printing error messages and aborting" << std::endl;
+		while (!errors.empty()){
+			lex_mesg error = errors.front();
+			std::cout << error.msg << std::endl;
+			errors.pop();
+		}
+		return;
+	}
+
+
+	//create the stacks we will use
+	std::vector<int> stack;
+	std::vector<int> save_stack;
+
 
 	//for our parsing purposes
 	tokens.push(new Token(INPUT_END));
@@ -19,7 +46,7 @@ void Parser::parse(std::queue<Token*> tokens){
 			tokens.pop();
 		}
 		else if (is_terminal(stack.back())){
-			//error here
+			std::cout << "Error during parsing in " << source_name << " exiting now." << std::endl;
 			break;
 		}
 		else if (parse_table.find({ stack.back(), tokens.front()->get_tag() }) != parse_table.end()){
@@ -44,17 +71,17 @@ void Parser::parse(std::queue<Token*> tokens){
 			std::cout << std::endl;
 		}
 		else {
-			//error here too
+			std::cout << "Error during parsing in " << source_name << " exiting now." << std::endl;
 			break;
 		}
 
 	}
 
 	if (stack.back() == INPUT_END && stack.back() == tokens.front()->get_tag()){
-		printf("Accepted!");
+		std::cout << source_name << " accepted!" << std::endl;
 	}
 	else {
-		printf("Failed!");
+		std::cout << source_name << " failed!" << std::endl;
 	}
 
 }
