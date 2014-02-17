@@ -54,6 +54,11 @@ int main(int argc, char** argv)
 	}
 
 
+	//release ifstream memory
+	for (std::vector<std::ifstream*>::iterator it = sources.begin(); it != sources.end(); ++it){
+		delete *it;
+	}
+
 	return 0;
 }
 
