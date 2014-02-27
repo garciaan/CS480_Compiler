@@ -579,7 +579,7 @@ void plus(oper_return oper1, oper_return oper2, oper_return* synth){
 
 void multi(oper_return oper1, oper_return oper2, oper_return *synth){
 	if (oper1.type == INT && oper2.type == INT){
-		synth->int_value = oper1.int_value + oper2.int_value;
+		synth->int_value = oper1.int_value *  oper2.int_value;
 		synth->type = INT;
 		synth->code = std::to_string(oper1.int_value * oper2.int_value);
 	}
