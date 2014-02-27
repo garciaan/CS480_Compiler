@@ -79,13 +79,6 @@
 
 // End non-terminals
 
-// Values here for generation
-#define RECORD 400
-
-
-
-
-
 static
 
 struct tag_meaning
@@ -154,8 +147,7 @@ Meanings[] =
 	{ NON_VARLIST_1, "NON_VARLIST_1", "VARLIST'" },
 	{ NON_TYPE, "NON_TYPE", "TYPE" },
 	{ NON_NEGOP, "NON_NEGOP", "NEGOP" },
-	{ EMPTY, "EMPTY", "EMPTY" },
-	{ RECORD, "", "" }
+	{ EMPTY, "EMPTY", "EMPTY" }
 };
 
 

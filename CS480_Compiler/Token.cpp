@@ -15,7 +15,7 @@ std::string Token::tag_to_string(int tag){
 		}
 	}
 
-	return "BAD_INPUT";
+	return "";
 
 }
 
@@ -31,7 +31,7 @@ std::string Token::tag_to_input(int tag){
 		}
 	}
 
-	return "BAD_INPUT";
+	return "";
 
 }
 

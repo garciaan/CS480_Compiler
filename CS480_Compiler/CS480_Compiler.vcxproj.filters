@@ -24,13 +24,10 @@
     <ClCompile Include="Lex.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Parser.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Symbol_Table.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Parse_Table.cpp">
+    <ClCompile Include="Parser.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -41,16 +38,13 @@
     <ClInclude Include="Lex.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Parser.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Parse_Table.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Symbol_Table.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Generation.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Parser.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

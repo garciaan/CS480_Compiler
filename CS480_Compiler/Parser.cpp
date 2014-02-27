@@ -1,9 +1,7 @@
-//Parser.cpp
-
 #include "Parser.h"
 
+void parse(std::ifstream &source, std::string source_name, Symbol_Table &table, bool verbose){
 
-void parse(std::ifstream &source, std::string source_name, Symbol_Table &table, std::map<map_key, std::vector<int>, map_key_comparer> &parse_table, bool verbose){
 
 	//setup file stream
 	source >> std::noskipws;
@@ -13,107 +11,433 @@ void parse(std::ifstream &source, std::string source_name, Symbol_Table &table, 
 	// process all input
 	lex.tokenize(0);
 
-	//check for errors, abort if we have any
-	/*if (!errors.empty()){
-		std::cout << "Errors during tokenization, in " << source_name << " printing error messages and aborting" << std::endl;
-		while (!errors.empty()){
-			lex_mesg error = errors.front();
-			std::cout << error.msg << std::endl;
-			errors.pop();
-		}
-		return;
-	}*/
+	int result = start(lex);
 
-
-	//std::queue<Token*> tokens;
-
-	//create the stacks we will use
-	std::vector<Stack_Type> stack;
-	std::vector<Stack_Type> save_stack;
-
-
-	//intialize stack
-	stack.push_back(Stack_Type(INPUT_END));
-	stack.push_back(Stack_Type(NON_START));
-
-	//while our stack has not been cleared
-	while (stack.back().get_tag() != INPUT_END){
-
-		//if both the stack and queue have the same terminal on top
-		if (stack.back().get_tag() == lex.peek().get_tag()){
-			save_stack.push_back(stack.back());
-			stack.pop_back();
-			lex.pop();
-		}
-		//if we have an unmatched terminal on the stack error out
-		else if (is_terminal(stack.back().get_tag())){
-			std::cout << "Error during parsing in " << source_name << " exiting now." << std::endl;
-			break;
-		}
-		// if we have one of the records we use to generate code
-		else if (is_record(stack.back().get_tag())){
-
-			//run func in the stack record;
-
-		}
-		//if we have a non-terminal on top of the stack find the correct rule from the parse table and use it
-		else if (parse_table.find({ stack.back().get_tag(), lex.peek_tag() }) != parse_table.end()){
-			std::vector<int> prod = parse_table[{stack.back().get_tag(), lex.peek_tag()}];
-			stack.pop_back();
-			for (std::vector<int>::reverse_iterator it = prod.rbegin(); it != prod.rend(); ++it){
-				if (*it != EMPTY){
-					stack.push_back(*it);
-				}
-			}
-
-			//visualization of derivation
-
-			if (verbose){
-
-				//print stack in reverse order
-				for (std::vector<Stack_Type>::iterator it = save_stack.begin(); it != save_stack.end(); ++it){
-					std::cout << ' ' << Token::tag_to_input(it->get_tag()) << ' ';
-				}
-
-				for (std::vector<Stack_Type>::reverse_iterator it = stack.rbegin(); it != stack.rend(); ++it){
-					std::cout << ' ' << Token::tag_to_input(it->get_tag()) << ' ';
-				}
-				std::cout << std::endl;
-
-			}
-		}
-
-		//if there was no rule for the non-terminal and input symbol we have a problem
-		else {
-			std::cout << "Error during parsing in " << source_name << " exiting now." << std::endl;
-			break;
-		}
-
-	}
-
-	//if we emptied both the stack and the queue with no errors
-	if (stack.back().get_tag() == INPUT_END && stack.back().get_tag() == lex.peek_tag()){
-		std::cout << source_name << " accepted!" << std::endl;
-	/*	if (verbose){
-			while (!tokens_copy.empty()){
-				std::cout << '<' << Token::tag_to_string(tokens_copy.front()->get_tag()) << '>';
-				delete tokens_copy.front();
-				tokens_copy.pop();
-			}
-		}
-		else {
-			while (!tokens_copy.empty()){
-				delete tokens_copy.front();
-				tokens_copy.pop();
-			}
-		}*/
+	if (result == 0){
+		std::cout << "Accepted!" << std::endl;
 	}
 	else {
-		std::cout << source_name << " failed!" << std::endl;
-		//while (!tokens_copy.empty()){
-		//	delete tokens_copy.front();
-		//	tokens_copy.pop();
-		//}
+		std::cout << "Rejected!" << std::endl;
+	}
+}
+
+int start(Lexer &lex){
+	if (lex.peek_tag() != L_BRACKET){
+		//error
+		return -1;
 	}
 
+	lex.pop();
+
+	//TODO get return value?
+	int result = s(lex);
+
+	if (lex.peek_tag() != R_BRACKET || (result != 0)){
+		//error
+		return -1;
+	}
+
+	//accept
+	return 0;
+
+}
+
+int s(Lexer &lex){
+
+
+	if (lex.peek_tag() == L_BRACKET){
+		lex.pop();
+		s_2(lex);
+	}
+	else if (lex.peek_tag() == ID){
+		lex.pop();
+		s_1(lex);
+	}
+	else if (is_CONST(lex.peek_tag())){
+		const_0(lex);
+		s_1(lex);
+
+	}
+	else {
+		//time to error
+		return -1;
+	}
+
+	return 0;
+
+}
+
+int s_1(Lexer &lex){
+	if (lex.peek_tag() == L_BRACKET || 
+		lex.peek_tag() == ID || is_CONST(lex.peek_tag())){
+			s(lex);
+			s_1(lex);
+	}
+	else if (lex.peek_tag() == R_BRACKET){
+		return 0;
+	}
+	else{
+		//error
+		return -1;
+	}
+
+	return 0;
+}
+
+int s_2(Lexer &lex){
+	if (lex.peek_tag() == L_BRACKET || is_CONST(lex.peek_tag()) || lex.peek_tag() == ID){
+		lex.pop();
+		s(lex);
+		if (lex.peek_tag() != R_BRACKET){
+			//error
+			return -1;
+		}
+		else {
+			lex.pop();
+			s_1(lex);
+			return 0;
+		}
+	}
+	else if (lex.peek_tag() == R_BRACKET){
+		lex.pop();
+		s_1(lex);
+	}
+	else if (is_BINOP(lex.peek_tag()) || is_UNOP(lex.peek_tag()) 
+		|| (lex.peek_tag() == MINUS) || (lex.peek_tag() == ASSIGN) || (lex.peek_tag() == IF)
+		|| (lex.peek_tag() == WHILE) || (lex.peek_tag() == LET) || (lex.peek_tag() == ID)){
+		expr_1(lex);
+		s_1(lex);
+	}
+	else if (lex.peek_tag() == STDOUT){
+		stmt_1(lex);
+		s_1(lex);
+	}
+	else {
+		//error
+		return -1;
+	}
+}
+
+int expr(Lexer &lex){
+
+	if (lex.peek_tag() == L_BRACKET){
+		lex.pop();
+		expr_1(lex);
+	}
+	else if (lex.peek_tag() == ID){
+		lex.pop();
+	}
+	else if (is_CONST(lex.peek_tag())){
+		const_0(lex);
+	}
+	else {
+		//error
+		return -1;
+	}
+
+	return 0;
+}
+
+int expr_1(Lexer &lex){
+	if ((lex.peek_tag() == ASSIGN) || is_BINOP(lex.peek_tag()) || lex.peek_tag() == MINUS
+		|| is_UNOP(lex.peek_tag())){
+		oper_1(lex);
+	}
+	else if ((lex.peek_tag() == IF) || (lex.peek_tag() == WHILE) || (lex.peek_tag() == LET)){
+		stmt_1(lex);
+	} else if (lex.peek_tag() == STDOUT){
+		s_1(lex);
+	}
+
+	return 0;
+}
+
+int oper(Lexer &lex){
+	if (lex.peek_tag() == L_BRACKET){
+		lex.pop();
+		oper_1(lex);
+	}
+	else if (lex.peek_tag() == ID){
+		lex.pop();
+	}
+	else if (is_CONST(lex.peek_tag())){
+		const_0(lex);
+	}
+	else {
+		return -1;
+	}
+
+	return 0;
+}
+
+int oper_1(Lexer &lex){
+	if (lex.peek_tag() == ASSIGN){
+		lex.pop();
+		if (lex.peek_tag() == ID){
+			lex.pop();
+			oper(lex);
+			if (lex.peek_tag() != R_BRACKET){
+				return -1;
+			}
+			else {
+				lex.pop();
+			}
+		}
+	}
+	else if (is_BINOP(lex.peek_tag())){
+		binop(lex);
+		oper(lex);
+		oper(lex);
+		if (lex.peek_tag() == R_BRACKET){
+			lex.pop();
+		}
+		else {
+			return -1;
+		}
+	}
+	else if (is_UNOP(lex.peek_tag())){
+		unop(lex);
+		oper(lex);
+		if (lex.peek_tag() == R_BRACKET){
+			lex.pop();
+		}
+		else {
+			return -1;
+		}
+	}
+	else if (lex.peek_tag() == MINUS){
+		lex.pop();
+		oper(lex);
+		negop(lex);
+	} else {
+		return -1;
+		
+	}
+}
+
+int stmt(Lexer &lex){
+	if (lex.peek_tag() == L_BRACKET){
+		lex.pop();
+		stmt_1(lex);
+	}
+	else {
+		return -1;
+	}
+	return 0;
+}
+
+int stmt_1(Lexer &lex){
+	if (lex.peek_tag() == IF){
+		lex.pop();
+		expr(lex);
+		expr(lex);
+		ifstmt(lex);
+	}
+	else if (lex.peek_tag() == WHILE){
+		lex.pop();
+		expr(lex);
+		exprlist(lex);
+		if (lex.peek_tag() != R_BRACKET){
+			return -1;
+		}
+		else {
+			lex.pop();
+		}
+	}
+	else if (lex.peek_tag() == LET){
+		lex.pop();
+		if (lex.peek_tag() == L_BRACKET){
+			lex.pop();
+			varlist(lex);
+			if (lex.peek_tag() == R_BRACKET){
+				lex.pop();
+			}
+			else {
+				return -1;
+			}
+		}
+		else {
+			return -1;
+		}
+	}
+	else if (lex.peek_tag() == STDOUT){
+		lex.pop();
+		oper(lex);
+		if (lex.peek_tag() != R_BRACKET){
+			return -1;
+		}
+		else {
+			lex.pop();
+		}
+		return 0;
+	}
+	else {
+		return -1;
+	}
+
+}
+
+int binop(Lexer &lex){
+	if (is_BINOP(lex.peek_tag())){
+		lex.pop();
+	}
+	else {
+		return -1;
+	}
+
+	return 0;
+}
+
+int unop(Lexer &lex){
+	if (is_UNOP(lex.peek_tag())){
+		lex.pop();
+	}
+	else {
+		return -1;
+	}
+
+	return 0;
+}
+
+int const_0(Lexer &lex){
+	if (is_CONST(lex.peek_tag())){
+		lex.pop();
+		return 0;
+	}
+	else {
+		return -1;
+	}
+}
+
+int ifstmt(Lexer &lex){
+
+	if (lex.peek_tag() == L_BRACKET || lex.peek_tag() == ID || is_CONST(lex.peek_tag())){
+		expr(lex);
+		if (lex.peek_tag() == R_BRACKET){
+			lex.pop();
+			return 0;
+		}
+		else {
+			return -1;
+		}
+
+	}
+	else if (lex.peek_tag() == R_BRACKET){
+		lex.pop();
+	}
+	else {
+		return 0;
+	}
+}
+
+int exprlist(Lexer &lex){
+	if (lex.peek_tag() == L_BRACKET || lex.peek_tag() == ID || is_CONST(lex.peek_tag())){
+		expr(lex);
+		exprlist_1(lex);
+	}
+	else {
+		return -1;
+	}
+
+	return 0;
+}
+
+int exprlist_1(Lexer &lex){
+	if (lex.peek_tag() == L_BRACKET || lex.peek_tag() == ID || is_CONST(lex.peek_tag())){
+		exprlist(lex);
+	}
+	else if (lex.peek_tag() == R_BRACKET){
+		return 0;
+	}
+	else {
+		return -1;
+	}
+
+	return 0;
+
+}
+
+int varlist(Lexer &lex){
+	if (lex.peek_tag() == L_BRACKET){
+		lex.pop();
+		if (lex.peek_tag() == ID){
+			lex.pop();
+			type(lex);
+			if (lex.peek_tag() == R_BRACKET){
+				lex.pop();
+				varlist_1(lex);
+			}
+			else {
+				return -1;
+
+			}
+		}
+		else {
+			return -1;
+		}
+	}
+	else {
+		return -1;
+	}
+}
+
+int varlist_1(Lexer &lex){
+	if (lex.peek_tag() == R_BRACKET){
+		lex.pop();
+	}
+	else if (lex.peek_tag() == L_BRACKET){
+		varlist(lex);
+	}
+	else {
+		return -1;
+	}
+
+	return 0;
+}
+
+int type(Lexer &lex){
+	if (lex.peek_tag() == BOOL_T || lex.peek_tag() == INT_T ||
+		lex.peek_tag() == REAL_T || lex.peek_tag() == STRING_T){
+		lex.pop();
+	}
+	else {
+		return -1;
+	}
+
+	return 0;
+}
+
+int negop(Lexer &lex){
+	if (is_CONST(lex.peek_tag()) || lex.peek_tag() == L_BRACKET || lex.peek_tag() == ID){
+		oper(lex);
+		if (lex.peek_tag() == R_BRACKET){
+			lex.pop();
+		}
+		else {
+			return - 1;
+		}
+	}
+	else if (lex.peek_tag() == R_BRACKET){
+		lex.pop();
+	}
+	else{
+		return -1;
+	}
+	return 0;
+
+}
+
+bool is_CONST(int val){
+	return (val == INT_L) || (val == REAL_L) || (val == STRING_L)
+		|| (val == TRUE) || (val == FALSE);
+}
+
+bool is_BINOP(int val){
+	return (val == AND) || (val == OR) || (val == PLUS) || (val == MULTI) || (val == DIV) ||
+		(val == MOD) || (val == EXP) || (val == EQ) || (val == NE) || (val == LT) ||
+		(val == GT) || (val == LE) || (val == GE);
+}
+
+bool is_UNOP(int val){
+	return (val == NOT) || (val == SIN) || (val == COS) || (val == TAN);
 }

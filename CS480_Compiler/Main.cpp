@@ -1,4 +1,6 @@
+
 #include "Parser.h"
+
 
 
 int main(int argc, char** argv)
@@ -41,16 +43,13 @@ int main(int argc, char** argv)
 	}
 
 
-	//setup parse table
-	std::map<map_key, std::vector<int>, map_key_comparer> parse_table;
+
 	Symbol_Table symbol_table;
 
-
 	create_symbol_table(symbol_table);
-	create_parse_table(parse_table);
 
 	for (unsigned i = 0; i < sources.size(); ++i){
-		parse(*sources[i], source_names[i], symbol_table, parse_table, verbose);
+		parse(*sources[i], source_names[i], symbol_table, verbose);
 	}
 
 
