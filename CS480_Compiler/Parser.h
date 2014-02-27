@@ -26,43 +26,49 @@ void parse(std::ifstream &source, std::string source_name, Symbol_Table &table, 
 
 int start(Lexer &lex);
 
-int s(Lexer &lex);
+int s(Lexer &lex, std::string *code);
 
-int s_1(Lexer &lex);
+int s_1(Lexer &lex, std::string *code);
 
-int s_2(Lexer &lex);
+int s_2(Lexer &lex, std::string *code);
 
-int expr(Lexer &lex);
+int expr(Lexer &lex, std::string *code);
 
-int expr_1(Lexer &lex);
+int expr_1(Lexer &lex, std::string *code);
 
-int oper(Lexer &lex);
+int oper(Lexer &lex, oper_return *val);
 
-int oper_1(Lexer &lex);
+int oper_1(Lexer &lex, oper_return *val);
 
-int stmt(Lexer &lex);
+int stmt(Lexer &lex, std::string *code);
 
-int stmt_1(Lexer &lex);
+int stmt_1(Lexer &lex, std::string *code);
 
-int binop(Lexer &lex);
+int binop(Lexer &lex, oper_return *val);
 
-int unop(Lexer &lex);
+int unop(Lexer &lex, oper_return *val);
 
-int const_0(Lexer &lex);
+int const_0(Lexer &lex, oper_return *val);
 
-int ifstmt(Lexer &lex);
+int ifstmt(Lexer &lex, std::string *code);
 
-int exprlist(Lexer &lex);
+int exprlist(Lexer &lex, std::string *code);
 
-int exprlist_1(Lexer &lex);
+int exprlist_1(Lexer &lex, std::string *code);
 
-int varlist(Lexer &lex);
+int varlist(Lexer &lex, std::string *code);
 
-int varlist_1(Lexer &lex);
+int varlist_1(Lexer &lex, std::string *code);
 
-int type(Lexer &lex);
+int type(Lexer &lex, std::string *code);
 
-int negop(Lexer &lex);
+int negop(Lexer &lex, oper_return *val);
+
+//oper evaluation helper functions
+
+void plus(oper_return, oper_return, oper_return*);
+
+
 
 bool is_CONST(int);
 
