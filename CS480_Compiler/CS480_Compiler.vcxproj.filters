@@ -50,6 +50,9 @@
     <ClInclude Include="Symbol_Table.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Generation.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="Pass_Test_1.txt">

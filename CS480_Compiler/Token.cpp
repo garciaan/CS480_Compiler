@@ -116,3 +116,11 @@ bool is_terminal(Token token){
 	}
 	return false;
 }
+
+bool is_record(Token token){
+	if (token.get_tag() >= 400 && token.get_tag() < 600){
+		return true;
+	}
+	return false;
+}
+

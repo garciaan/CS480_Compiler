@@ -74,10 +74,16 @@
 
 #define EMPTY 299
 
-
+#define LINE_END 300
 #define INPUT_END 333
 
-#define LINE_END 999
+// End non-terminals
+
+// Values here for generation
+#define RECORD 400
+
+
+
 
 
 static
@@ -148,7 +154,8 @@ Meanings[] =
 	{ NON_VARLIST_1, "NON_VARLIST_1", "VARLIST'" },
 	{ NON_TYPE, "NON_TYPE", "TYPE" },
 	{ NON_NEGOP, "NON_NEGOP", "NEGOP" },
-	{ EMPTY, "EMPTY", "EMPTY" }
+	{ EMPTY, "EMPTY", "EMPTY" },
+	{ RECORD, "", "" }
 };
 
 
@@ -224,6 +231,8 @@ public:
 
 bool is_terminal(Token token);
 bool is_non_terminal(Token token);
+bool is_record(Token token);
+
 
 
 #endif //TOKEN_H

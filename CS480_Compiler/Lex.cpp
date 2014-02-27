@@ -3,16 +3,61 @@
 
 using namespace std;
 
-void tokenize(istream &source, std::queue<Token*> &queue, Symbol_Table &table, std::queue<lex_mesg> &errors, std::queue<lex_mesg> &warnings){
+
+
+
+Lexer::~Lexer(){
+
+	//free memory in our queue
+	while (!queue.empty()){
+		delete queue.front();
+		queue.pop();
+	}
+}
+
+
+Token Lexer::peek(){
+
+	if (queue.empty()){
+		 int result = tokenize(1);
+		 if (result == -1){
+			 return Token(INPUT_END);
+		}
+	} 
+	
+	return *queue.front();
+}
+
+int Lexer::peek_tag(){
+
+	if (queue.empty()){
+		int result = tokenize(1);
+		if (result == -1){
+			return INPUT_END;
+		}
+	}
+
+	return queue.front()->get_tag();
+}
+
+void Lexer::pop(){
+
+	queue.pop();
+}
+
+// returns the number of tokens created, or -1 if non were
+int Lexer::tokenize(int num_tokens){
 
 	int line_num = 1;
+	int cur_tokens = 0;
+	num_tokens = num_tokens > 0 ? num_tokens : -1;
 
 	string value;
 
 	//infinte loop to process each character
 	//one pass through this loop should be equivlent to going
 	//from a start state to a final state on our FSA
-	for (;;){
+	while (cur_tokens != num_tokens){
 
 		//value is used to hold itermediate lexme values. Cleared after every run.
 		value = "";
@@ -44,9 +89,11 @@ void tokenize(istream &source, std::queue<Token*> &queue, Symbol_Table &table, s
 
 			if (attempt < 0){
 				queue.push(new IdToken(value));
+				++cur_tokens;
 			}
 			else {
 				queue.push(new Token(attempt));
+				++cur_tokens;
 			}
 
 		}
@@ -113,9 +160,11 @@ void tokenize(istream &source, std::queue<Token*> &queue, Symbol_Table &table, s
 				value.find("e") != string::npos ||
 				value.find("E") != string::npos){
 				queue.push(new RealToken(value));
+				++cur_tokens;
 			}
 			else {
 				queue.push(new IntToken(value));
+				++cur_tokens;
 			}
 
 		}
@@ -130,6 +179,7 @@ void tokenize(istream &source, std::queue<Token*> &queue, Symbol_Table &table, s
 			source.ignore();
 
 			queue.push(new StrToken(value));
+			++cur_tokens;
 
 		}
 		else {
@@ -141,40 +191,49 @@ void tokenize(istream &source, std::queue<Token*> &queue, Symbol_Table &table, s
 
 			case '[':
 				queue.push(new Token(L_BRACKET));
+				++cur_tokens;
 				source.ignore();
 				break;
 			case ']':
 				queue.push(new Token(R_BRACKET));
+				++cur_tokens;
 				source.ignore();
 				break;
 			case '+':
 				queue.push(new Token(PLUS));
+				++cur_tokens;
 				source.ignore();
 				break;
 			case '-':
 				queue.push(new Token(MINUS));
+				++cur_tokens;
 				source.ignore();
 				break;
 			case '*':
 				queue.push(new Token(MULTI));
+				++cur_tokens;
 				source.ignore();
 				break;
 			case '/':
 				queue.push(new Token(DIV));
+				++cur_tokens;
 				source.ignore();
 				break;
 			case '=':
 				queue.push(new Token(EQ));
+				++cur_tokens;
 				source.ignore();
 				break;
 			case '<':
 				source.ignore();
 				if (source.peek() == '='){
 					queue.push(new Token(LE));
+					++cur_tokens;
 					source.ignore();
 				}
 				else{
 					queue.push(new Token(LT));
+					++cur_tokens;
 				}
 				
 				break;
@@ -182,25 +241,30 @@ void tokenize(istream &source, std::queue<Token*> &queue, Symbol_Table &table, s
 				source.ignore();
 				if (source.peek() == '='){
 					queue.push(new Token(GE));
+					++cur_tokens;
 					source.ignore();
 				}
 				else{
 					queue.push(new Token(GT));
+					++cur_tokens;
 				}
 				
 				break;
 			case '%':
 				queue.push(new Token(MOD));
+				++cur_tokens;
 				source.ignore();
 				break;
 			case '^':
 				queue.push(new Token(EXP));
+				++cur_tokens;
 				source.ignore();
 				break;
 			case ':':
 				source.ignore();
 				if (source.peek() == '='){
 					queue.push(new Token(ASSIGN));
+					++cur_tokens;
 					source.ignore();
 				}
 				break;
@@ -208,6 +272,7 @@ void tokenize(istream &source, std::queue<Token*> &queue, Symbol_Table &table, s
 				source.ignore();
 				if (source.peek() == '='){
 					queue.push(new Token(NE));
+					++cur_tokens;
 					source.ignore();
 				}
 				break;
@@ -242,5 +307,12 @@ void tokenize(istream &source, std::queue<Token*> &queue, Symbol_Table &table, s
 		}
 
 	}
-	return;
+
+	if (cur_tokens > 0){
+		return cur_tokens;
+	}
+	else {
+		return -1;
+	}
+	
 }

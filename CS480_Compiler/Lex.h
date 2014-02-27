@@ -19,6 +19,31 @@ struct _lex_mesg{
 } typedef lex_mesg;
 
 
-void tokenize(std::istream &source, std::queue<Token*> &queue, Symbol_Table &table, std::queue<lex_mesg> &errors, std::queue<lex_mesg> &warnings);
+
+class Lexer
+{
+public:
+	Lexer(std::istream &_source, Symbol_Table &_table) : source(_source), table(_table){}
+	~Lexer();
+
+	Token peek();
+	int peek_tag();
+	void pop();
+	int tokenize(int num_tokens);
+
+	const std::queue<lex_mesg>& get_errors();
+	const std::queue<lex_mesg>& get_warnings();
+
+private:
+
+	std::istream &source;
+	Symbol_Table &table;
+	std::queue<Token*> queue; 
+	std::queue<lex_mesg> errors;
+	std::queue<lex_mesg> warnings;
+
+};
+
+
 
 #endif //LEX_H
