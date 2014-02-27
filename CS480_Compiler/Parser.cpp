@@ -152,16 +152,20 @@ int expr_1(Lexer &lex){
 	return 0;
 }
 
-int oper(Lexer &lex){
+int oper(Lexer &lex, oper_return* synth){
 	if (lex.peek_tag() == L_BRACKET){
 		lex.pop();
-		oper_1(lex);
+		oper_1(lex, synth);
 	}
 	else if (lex.peek_tag() == ID){
+
+		synth->type = CODE;
+		synth->code = ((IdToken*)lex.peek())->get_id();
+
 		lex.pop();
 	}
 	else if (is_CONST(lex.peek_tag())){
-		const_0(lex);
+		const_0(lex, synth);
 	}
 	else {
 		return -1;
@@ -170,7 +174,7 @@ int oper(Lexer &lex){
 	return 0;
 }
 
-int oper_1(Lexer &lex){
+int oper_1(Lexer &lex, oper_return* synth){
 	if (lex.peek_tag() == ASSIGN){
 		lex.pop();
 		if (lex.peek_tag() == ID){
@@ -299,14 +303,37 @@ int unop(Lexer &lex){
 	return 0;
 }
 
-int const_0(Lexer &lex){
-	if (is_CONST(lex.peek_tag())){
-		lex.pop();
-		return 0;
+int const_0(Lexer &lex, oper_return* synth){
+
+	if (lex.peek_tag == STRING_L){
+		synth->type = STRING;
+		synth->str_value = ((StrToken*)lex.peek())->get_str();
+		synth->code = ((StrToken*)lex.peek())->get_str();
+	}
+	else if (lex.peek_tag == INT_L){
+		synth->type = INT;
+		synth->str_value = ((IntToken*)lex.peek())->get_int();
+		synth->code = ((IntToken*)lex.peek())->get_int();
+	}
+	else if (lex.peek_tag == REAL_L){
+		synth->type = REAL;
+		synth->str_value = ((RealToken*)lex.peek())->get_real();
+		synth->code = ((RealToken*)lex.peek())->get_real();
+	}
+	else if (lex.peek_tag == TRUE){
+		synth->type = BOOL;
+		synth->int_value = 1;
+		synth->code = "true";
+	}
+	else if (lex.peek_tag == FALSE){
+		synth->type = BOOL;
+		synth->int_value = 0;
+		synth->code = "false";
 	}
 	else {
 		return -1;
 	}
+	return 0;
 }
 
 int ifstmt(Lexer &lex){

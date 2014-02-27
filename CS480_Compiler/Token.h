@@ -179,6 +179,7 @@ class StrToken : public Token
 
 public:
 	StrToken(std::string _str);
+	std::string get_str();
 	void print();
 };
 
@@ -188,6 +189,7 @@ class IdToken : public Token
 
 public:
 	IdToken(std::string _str);
+	std::string get_id();
 	void print();
 };
 
@@ -198,6 +200,7 @@ class IntToken : public Token
 
 public:
 	IntToken(std::string _int);
+	int get_int();
 	void print();
 };
 
@@ -207,6 +210,7 @@ class RealToken : public Token
 
 public:
 	RealToken(std::string _real);
+	double get_real();
 	void print();
 };
 

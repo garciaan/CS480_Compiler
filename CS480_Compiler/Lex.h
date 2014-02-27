@@ -26,7 +26,7 @@ public:
 	Lexer(std::istream &_source, Symbol_Table &_table) : source(_source), table(_table){}
 	~Lexer();
 
-	Token peek();
+	Token *peek();
 	int peek_tag();
 	void pop();
 	int tokenize(int num_tokens);

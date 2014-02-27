@@ -16,16 +16,16 @@ Lexer::~Lexer(){
 }
 
 
-Token Lexer::peek(){
+Token *Lexer::peek(){
 
 	if (queue.empty()){
 		 int result = tokenize(1);
 		 if (result == -1){
-			 return Token(INPUT_END);
+			 return NULL;
 		}
 	} 
 	
-	return *queue.front();
+	return queue.front();
 }
 
 int Lexer::peek_tag(){

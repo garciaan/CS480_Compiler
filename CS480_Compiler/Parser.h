@@ -10,6 +10,18 @@
 #include "Lex.h"
 
 
+
+enum oper_type { INT, REAL, STRING, BOOL, CODE};
+
+typedef  struct _oper_return{
+	oper_type type;
+	std::string str_value;
+	int int_value;
+	double real_value;
+	std::string code;
+}oper_return;
+
+
 void parse(std::ifstream &source, std::string source_name, Symbol_Table &table, bool verbose);
 
 int start(Lexer &lex);
