@@ -6,6 +6,7 @@
 #include <map>
 #include <queue>
 #include <vector>
+#include <cmath>
 #include "Token.h"
 #include "Lex.h"
 

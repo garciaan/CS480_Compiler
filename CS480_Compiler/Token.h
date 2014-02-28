@@ -108,7 +108,7 @@ Meanings[] =
 	{ MINUS, "MINUS", "-" },
 	{ MULTI, "MULTI", "*" },
 	{ DIV, "DIV", "/" },
-	{ MOD, "MOD", "%" },
+	{ MOD, "MOD", "mod" },
 	{ EXP, "EXP", "^" },
 	{ EQ, "EQ", "=" },
 	{ NE, "NE", "!=" },

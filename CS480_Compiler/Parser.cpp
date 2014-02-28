@@ -568,10 +568,17 @@ void plus(oper_return oper1, oper_return oper2, oper_return* synth){
 		synth->code = temp.str();
 	}
 	else if ((oper1.type == REAL && oper2.type == INT)){
-		synth->real_value = (double)oper2.int_value + oper1.real_value;
+		synth->real_value = oper1.real_value + (double)oper2.int_value;
 		synth->type = REAL;
 		std::stringstream temp;
-		temp << std::scientific << (double)oper2.int_value + oper1.real_value << " ";
+		temp << std::scientific << oper1.real_value + (double)oper2.int_value << " ";
+		synth->code = temp.str();
+	}
+	else if ((oper1.type == REAL && oper2.type == REAL)){
+		synth->real_value = oper1.real_value + oper2.real_value;
+		synth->type = REAL;
+		std::stringstream temp;
+		temp << std::scientific << oper1.real_value + oper2.real_value << " ";
 		synth->code = temp.str();
 	}
 	//other cases?
@@ -592,24 +599,142 @@ void multi(oper_return oper1, oper_return oper2, oper_return *synth){
 		synth->code = temp.str();
 	}
 	else if ((oper1.type == REAL && oper2.type == INT)){
-		synth->real_value = (double)oper2.int_value * oper1.real_value;
+		synth->real_value = oper1.real_value * (double)oper2.int_value;
 		synth->type = REAL;
 		std::stringstream temp;
-		temp << std::scientific << (double)oper2.int_value * oper1.real_value << " ";
+		temp << std::scientific << oper1.real_value * (double)oper2.int_value << " ";
+		synth->code = temp.str();
+	}
+	else if ((oper1.type == REAL && oper2.type == REAL)){
+		synth->real_value = oper1.real_value * oper2.real_value;
+		synth->type = REAL;
+		std::stringstream temp;
+		temp << std::scientific << oper1.real_value * oper2.real_value << " ";
 		synth->code = temp.str();
 	}
 }
-void div(oper_return, oper_return, oper_return*){
+void div(oper_return oper1, oper_return oper2, oper_return *synth){
 
+	if (oper2.type == INT && oper2.int_value == 0 ||
+		oper2.type == REAL && oper2.real_value == 0){
+		//handle divide by zero errors
+	}
+
+
+	if (oper1.type == INT && oper2.type == INT){
+		synth->int_value = oper1.int_value / oper2.int_value;
+		synth->type = INT;
+		synth->code = std::to_string(oper1.int_value / oper2.int_value);
+	}
+	//addition and mixed int/float
+	else if ((oper1.type == INT && oper2.type == REAL)){
+		synth->real_value = (double)oper1.int_value / oper2.real_value;
+		synth->type = REAL;
+		std::stringstream temp;
+		temp << std::scientific << (double)oper1.int_value / oper2.real_value << " ";
+		synth->code = temp.str();
+	}
+	else if ((oper1.type == REAL && oper2.type == INT)){
+		synth->real_value = oper1.real_value / (double)oper2.int_value;
+		synth->type = REAL;
+		std::stringstream temp;
+		temp << std::scientific << oper1.real_value / (double)oper2.int_value << " ";
+		synth->code = temp.str();
+	}
+	else if ((oper1.type == REAL && oper2.type == REAL)){
+		synth->real_value = oper1.real_value / oper2.real_value;
+		synth->type = REAL;
+		std::stringstream temp;
+		temp << std::scientific << oper1.real_value / oper2.real_value << " ";
+		synth->code = temp.str();
+	}
 }
-void mod(oper_return, oper_return, oper_return*){
-
+void mod(oper_return oper1, oper_return oper2, oper_return *synth){
+	if (oper1.type == INT && oper2.type == INT){
+		synth->int_value = oper1.int_value % oper2.int_value;
+		synth->type = INT;
+		synth->code = std::to_string(oper1.int_value % oper2.int_value);
+	}
+	//addition and mixed int/float
+	else if ((oper1.type == INT && oper2.type == REAL)){
+		synth->real_value = fmod((double)oper1.int_value,oper2.real_value);
+		synth->type = REAL;
+		std::stringstream temp;
+		temp << std::scientific << fmod((double)oper1.int_value, oper2.real_value) << " ";
+		synth->code = temp.str();
+	}
+	else if ((oper1.type == REAL && oper2.type == INT)){
+		synth->real_value = fmod(oper1.real_value, (double)oper2.int_value);
+		synth->type = REAL;
+		std::stringstream temp;
+		temp << std::scientific << fmod(oper1.real_value, (double)oper2.int_value) << " ";
+		synth->code = temp.str();
+	}
+	else if ((oper1.type == REAL && oper2.type == REAL)){
+		synth->real_value = fmod(oper1.real_value, oper2.real_value);
+		synth->type = REAL;
+		std::stringstream temp;
+		temp << std::scientific << fmod(oper1.real_value, oper2.real_value) << " ";
+		synth->code = temp.str();
+	}
 }
-void exp(oper_return, oper_return, oper_return*){
-
+void exp(oper_return oper1, oper_return oper2, oper_return *synth){
+	if (oper1.type == INT && oper2.type == INT){
+		synth->int_value = pow(oper1.int_value, oper2.int_value);
+		synth->type = INT;
+		synth->code = std::to_string(pow(oper1.int_value, oper2.int_value));
+	}
+	//addition and mixed int/float
+	else if ((oper1.type == INT && oper2.type == REAL)){
+		synth->real_value = pow((double)oper1.int_value, oper2.real_value);
+		synth->type = REAL;
+		std::stringstream temp;
+		temp << std::scientific << pow((double)oper1.int_value, oper2.real_value) << " ";
+		synth->code = temp.str();
+	}
+	else if ((oper1.type == REAL && oper2.type == INT)){
+		synth->real_value = pow(oper1.real_value, (double)oper2.int_value);
+		synth->type = REAL;
+		std::stringstream temp;
+		temp << std::scientific << pow(oper1.real_value, (double)oper2.int_value) << " ";
+		synth->code = temp.str();
+	}
+	else if ((oper1.type == REAL && oper2.type == REAL)){
+		synth->real_value = pow(oper1.real_value, oper2.real_value);
+		synth->type = REAL;
+		std::stringstream temp;
+		temp << std::scientific << pow(oper1.real_value, oper2.real_value) << " ";
+		synth->code = temp.str();
+	}
 }
-void eq(oper_return, oper_return, oper_return*){
-
+void eq(oper_return oper1, oper_return oper2, oper_return *synth){
+	if (oper1.type == INT && oper2.type == INT){
+		synth->int_value = oper1.int_value == oper2.int_value;
+		synth->type = BOOL;
+		synth->code = (oper1.int_value == oper2.int_value) == 1 ? "true" : "false";
+	}
+	//addition and mixed int/float
+	else if ((oper1.type == INT && oper2.type == REAL)){
+		synth->real_value = pow((double)oper1.int_value, oper2.real_value);
+		synth->type = REAL;
+		std::stringstream temp;
+		temp << std::scientific << pow((double)oper1.int_value, oper2.real_value) << " ";
+		synth->code = temp.str();
+	}
+	else if ((oper1.type == REAL && oper2.type == INT)){
+		synth->real_value = pow(oper1.real_value, (double)oper2.int_value);
+		synth->type = REAL;
+		std::stringstream temp;
+		temp << std::scientific << pow(oper1.real_value, (double)oper2.int_value) << " ";
+		synth->code = temp.str();
+	}
+	else if ((oper1.type == REAL && oper2.type == REAL)){
+		synth->real_value = pow(oper1.real_value, oper2.real_value);
+		synth->type = REAL;
+		std::stringstream temp;
+		temp << std::scientific << pow(oper1.real_value, oper2.real_value) << " ";
+		synth->code = temp.str();
+	}
 }
 void le(oper_return, oper_return, oper_return*){
 
