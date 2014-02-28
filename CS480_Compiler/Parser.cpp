@@ -1,6 +1,6 @@
 #include "Parser.h"
 
-void parse(std::ifstream &source, std::string source_name, Symbol_Table &table, bool verbose){
+void parser::parse(std::ifstream &source, std::string source_name, Symbol_Table &table, bool verbose){
 
 
 	//setup file stream
@@ -21,7 +21,7 @@ void parse(std::ifstream &source, std::string source_name, Symbol_Table &table, 
 	}
 }
 
-int start(Lexer &lex){
+int parser::start(Lexer &lex){
 	if (lex.peek_tag() != L_BRACKET){
 		//error
 		return -1;
@@ -30,12 +30,9 @@ int start(Lexer &lex){
 	lex.pop();
 
 	//string that will repersent our complete code
-	std::string code = "";
+	std::string code = s(lex);
 
-	//TODO get return value?
-	int result = s(lex, &code);
-
-	if (lex.peek_tag() != R_BRACKET || (result != 0)){
+	if (lex.peek_tag() != R_BRACKET || (code.at(code.length() - 1) == '$')){
 		//error
 		return -1;
 	}
@@ -48,174 +45,167 @@ int start(Lexer &lex){
 
 }
 
-int s(Lexer &lex, std::string *code){
+std::string parser::s(Lexer &lex){
 
-	std::string code_0 = "";
+	std::string code = "";
 
 	if (lex.peek_tag() == L_BRACKET){
 		lex.pop();
-		s_2(lex, &code_0);
+		code  += s_2(lex);
 	}
 	else if (lex.peek_tag() == ID){
-		append_ID(lex, &code_0);
-		s_1(lex, &code_0);
+		code += parser::append_ID(lex);
+		code += s_1(lex);
 	}
 	else if (is_CONST(lex.peek_tag())){
-		append_CONST(lex, &code_0);
-		s_1(lex, &code_0);
+		code += parser::append_CONST(lex);
+		code += s_1(lex);
 	}
 	else {
 		//time to error
-		return -1;
+		return "$";
 	}
 
-	*code += code_0;
-	return 0;
-
+	return code;
 }
 
-int s_1(Lexer &lex, std::string *code){
+std::string parser::s_1(Lexer &lex){
 
-	std::string code_0;
+	std::string code;
 
 	if (lex.peek_tag() == L_BRACKET || 
 		lex.peek_tag() == ID || is_CONST(lex.peek_tag())){
-			s(lex, &code_0);
-			s_1(lex, &code_0);
+		code += s(lex) + s_1(lex);
+			
 	}
 	else if (lex.peek_tag() == R_BRACKET){
-		return 0;
+		code += "";
 	}
 	else{
 		//error
-		return -1;
+		return "$";
 	}
 
-	*code += code_0;
-	return 0;
+	return code;
 }
 
-int s_2(Lexer &lex, std::string *code){
+std::string parser::s_2(Lexer &lex){
 
-	std::string code_0;
+	std::string code;
 
 	if (lex.peek_tag() == L_BRACKET || is_CONST(lex.peek_tag()) || lex.peek_tag() == ID){
-		s(lex, &code_0);
+		code += s(lex);
 		if (lex.peek_tag() == R_BRACKET){
 			lex.pop();
-			s_1(lex, &code_0);
+			code += s_1(lex);
 		}
 		else {
 			//error
-			return -1;
+			return "$";
 		}
 	}
 	else if (lex.peek_tag() == R_BRACKET){
 		lex.pop();
-		s_1(lex, &code_0);
+		code += s_1(lex);
 	}
 	else if (is_BINOP(lex.peek_tag()) || is_UNOP(lex.peek_tag()) 
 		|| (lex.peek_tag() == MINUS) || (lex.peek_tag() == ASSIGN) || (lex.peek_tag() == IF)
 		|| (lex.peek_tag() == WHILE) || (lex.peek_tag() == LET) || (lex.peek_tag() == ID)){
 
-		expr_1(lex, &code_0);
-		s_1(lex, &code_0);
+		code += expr_1(lex) + s_1(lex);
 	}
 	else if (lex.peek_tag() == STDOUT){
-		stmt_1(lex, &code_0);
-		s_1(lex, &code_0);
+		code += stmt_1(lex) + s_1(lex);
 	}
 	else {
 		//error
-		return -1;
+		return "$";
 	}
 
-	*code += code_0;
-	return 0;
+	return code;
 }
 
-int expr(Lexer &lex, std::string *code){
+std::string parser::expr(Lexer &lex){
 
-	std::string code_0;
+	std::string code;
 
 	if (lex.peek_tag() == L_BRACKET){
 		lex.pop();
-		expr_1(lex, &code_0);
+		code += expr_1(lex);
 	}
 	else if (lex.peek_tag() == ID){
-		append_ID(lex, &code_0);
+		code += append_ID(lex);
 	}
 	else if (is_CONST(lex.peek_tag())){
-		append_CONST(lex, &code_0);
+		code += append_CONST(lex);
 	}
 	else {
 		//error
-		return -1;
+		return "$";
 	}
 
-	*code += code_0;
-	return 0;
+	return code;
 }
 
-int expr_1(Lexer &lex, std::string *code){
+std::string parser::expr_1(Lexer &lex){
 
-	std::string code_0;
+	std::string code;
 
 	if ((lex.peek_tag() == ASSIGN) || is_BINOP(lex.peek_tag()) || lex.peek_tag() == MINUS
 		|| is_UNOP(lex.peek_tag())){
 		oper_return val;
-		oper_1(lex, &val);
-		code_0 += val.code;
+		val = oper_1(lex);
+		code += val.code;
 	}
 	else if ((lex.peek_tag() == IF) || (lex.peek_tag() == WHILE) || (lex.peek_tag() == LET)){
-		stmt_1(lex, &code_0);
-	} else if (lex.peek_tag() == STDOUT){
-		s_1(lex, &code_0);
+		code += stmt_1(lex);
+	}
+	else if (lex.peek_tag() == STDOUT){
+		code += s_1(lex);
+	}
+	else {
+		//error
+		return "$";
 	}
 
-	*code += code_0;
-
-	return 0;
+	return code;
 }
 
-int oper(Lexer &lex, oper_return* synth){
+parser::oper_return parser::oper(Lexer &lex){
+
+	oper_return val;
 
 	if (lex.peek_tag() == L_BRACKET){
 		lex.pop();
-		oper_1(lex, synth);
+		val = oper_1(lex);
 	}
 	else if (lex.peek_tag() == ID){
 
-		synth->type = CODE;
-		synth->code = ((IdToken*)lex.peek())->get_id();
+		val.type = CODE;
+		val.code = ((IdToken*)lex.peek())->get_id();
 
 		lex.pop();
 	}
 	else if (is_CONST(lex.peek_tag())){
-		const_0(lex, synth);
+		val = const_0(lex);
 	}
 	else {
-		return -1;
+		val.code = '$';
 	}
 
-	return 0;
+	return val;
 }
 
-int oper_1(Lexer &lex, oper_return* synth){
+parser::oper_return parser::oper_1(Lexer &lex){
+
+	oper_return synth;
 
 	//we are going to ignore this step for now
 	if (lex.peek_tag() == ASSIGN){
 		lex.pop();
 		if (lex.peek_tag() == ID){
 			lex.pop();
-			oper_return val;
-			oper(lex, &val);
-			if (lex.peek_tag() != R_BRACKET){
-				return -1;
-			}
-			else {
-				lex.pop();
-			}
+			synth = oper(lex);
 		}
 	}
 
@@ -225,8 +215,8 @@ int oper_1(Lexer &lex, oper_return* synth){
 		oper_return oper1;
 		oper_return oper2;
 		binop(lex, &bin_op);
-		oper(lex, &oper1);
-		oper(lex, &oper2);
+		oper1 = oper(lex);
+		oper2 = oper(lex);
 
 
 		if (oper1.type == CODE || oper2.type == CODE){
@@ -280,13 +270,6 @@ int oper_1(Lexer &lex, oper_return* synth){
 				break;
 			}
 		}
-		
-		if (lex.peek_tag() == R_BRACKET){
-			lex.pop();
-		}
-		else {
-			return -1;
-		}
 	}
 	else if (is_UNOP(lex.peek_tag())){
 		int un_op;
@@ -320,12 +303,6 @@ int oper_1(Lexer &lex, oper_return* synth){
 			}
 
 		}
-		if (lex.peek_tag() == R_BRACKET){
-			lex.pop();
-		}
-		else {
-			return -1;
-		}
 	}
 	else if (lex.peek_tag() == MINUS){
 		lex.pop();
@@ -337,18 +314,29 @@ int oper_1(Lexer &lex, oper_return* synth){
 		negop(lex, &oper2);
 	} else {
 		return -1;
-		
 	}
-}
 
-int stmt(Lexer &lex, std::string *code){
-	if (lex.peek_tag() == L_BRACKET){
+	if (lex.peek_tag() == R_BRACKET){
 		lex.pop();
-		stmt_1(lex, code);
 	}
 	else {
 		return -1;
 	}
+}
+
+int stmt(Lexer &lex, std::string *code){
+
+	std::string code_0;
+
+	if (lex.peek_tag() == L_BRACKET){
+		lex.pop();
+		stmt_1(lex, &code_0);
+	}
+	else {
+		return -1;
+	}
+
+	*code += code_0;
 	return 0;
 }
 
@@ -358,9 +346,9 @@ int stmt_1(Lexer &lex, std::string *code){
 
 	if (lex.peek_tag() == IF){
 		lex.pop();
-		expr(lex, code);
-		expr(lex, code);
-		ifstmt(lex, code);
+		expr(lex, &code_0);
+		expr(lex, &code_0);
+		ifstmt(lex, &code_0);
 	}
 	else if (lex.peek_tag() == WHILE){
 		lex.pop();
@@ -468,7 +456,7 @@ int const_0(Lexer &lex, oper_return* synth){
 	return 0;
 }
 
-int ifstmt(Lexer &lex, std::string *code){
+std::string ifstmt(Lexer &lex, std::string *code){
 
 	std::string code_0;
 
@@ -476,10 +464,10 @@ int ifstmt(Lexer &lex, std::string *code){
 		expr(lex, &code_0);
 		if (lex.peek_tag() == R_BRACKET){
 			lex.pop();
-			return 0;
+			return code_0;
 		}
 		else {
-			return -1;
+			return NULL;
 		}
 
 	}
@@ -593,7 +581,7 @@ int negop(Lexer &lex, oper_return *code){
 		}
 	}
 	else if (lex.peek_tag() == R_BRACKET){
-		lex.pop();
+
 	}
 	else{
 		return -1;
@@ -1022,15 +1010,16 @@ void tan(oper_return oper, oper_return *synth){
 	}
 }
 
-void append_ID(Lexer &lex, std::string *code){
-	*code = ((IdToken*)lex.peek())->get_id() + " ";
+std::string parser::append_ID(Lexer &lex){
+	std::string code = ((IdToken*)lex.peek())->get_id() + " ";
 	lex.pop();
+	return code;
 }
 
-void append_CONST(Lexer &lex, std::string *code){
+std::string parser::append_CONST(Lexer &lex){
 	oper_return val;
 	const_0(lex, &val);
-	*code += val.code + " ";
+	return val.code;
 }
 
 bool is_CONST(int val){

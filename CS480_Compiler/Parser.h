@@ -10,95 +10,97 @@
 #include "Token.h"
 #include "Lex.h"
 
+namespace parser
+{
+
+	enum oper_type { INT, REAL, STRING, BOOL, CODE };
+
+	typedef  struct _oper_return{
+		oper_type type;
+		std::string str_value;
+		int int_value;
+		double real_value;
+		std::string code;
+	}oper_return;
 
 
-enum oper_type { INT, REAL, STRING, BOOL, CODE};
+	void parse(std::ifstream &source, std::string source_name, Symbol_Table &table, bool verbose);
 
-typedef  struct _oper_return{
-	oper_type type;
-	std::string str_value;
-	int int_value;
-	double real_value;
-	std::string code;
-}oper_return;
+	int start(Lexer &lex);
 
+	std::string s(Lexer &lex);
 
-void parse(std::ifstream &source, std::string source_name, Symbol_Table &table, bool verbose);
+	std::string s_1(Lexer &lex);
 
-int start(Lexer &lex);
+	std::string s_2(Lexer &lex);
 
-int s(Lexer &lex, std::string *code);
+	std::string expr(Lexer &lex);
 
-int s_1(Lexer &lex, std::string *code);
+	std::string expr_1(Lexer &lex);
 
-int s_2(Lexer &lex, std::string *code);
+	oper_return oper(Lexer &lex);
 
-int expr(Lexer &lex, std::string *code);
+	oper_return oper_1(Lexer &lex);
 
-int expr_1(Lexer &lex, std::string *code);
+	std::string stmt(Lexer &lex);
 
-int oper(Lexer &lex, oper_return *val);
+	std::string stmt_1(Lexer &lex);
 
-int oper_1(Lexer &lex, oper_return *val);
+	int binop(Lexer &lex);
 
-int stmt(Lexer &lex, std::string *code);
+	int unop(Lexer &lex);
 
-int stmt_1(Lexer &lex, std::string *code);
+	oper_return const_0(Lexer &lex);
 
-int binop(Lexer &lex, int *val);
+	std::string ifstmt(Lexer &lex);
 
-int unop(Lexer &lex, int *val);
+	std::string exprlist(Lexer &lex);
 
-int const_0(Lexer &lex, oper_return *val);
+	std::string exprlist_1(Lexer &lex);
 
-int ifstmt(Lexer &lex, std::string *code);
+	std::string varlist(Lexer &lex);
 
-int exprlist(Lexer &lex, std::string *code);
+	std::string varlist_1(Lexer &lex);
 
-int exprlist_1(Lexer &lex, std::string *code);
+	std::string type(Lexer &lex);
 
-int varlist(Lexer &lex, std::string *code);
+	oper_return negop(Lexer &lex, oper_return *val);
 
-int varlist_1(Lexer &lex, std::string *code);
+	//oper evaluation helper functions
 
-int type(Lexer &lex, std::string *code);
+	//binop helpers
+	oper_return plus(oper_return, oper_return);
+	oper_return multi(oper_return, oper_return);
+	oper_return div(oper_return, oper_return);
+	oper_return mod(oper_return, oper_return);
+	oper_return exp(oper_return, oper_return);
+	oper_return eq(oper_return, oper_return);
+	oper_return le(oper_return, oper_return);
+	oper_return lt(oper_return, oper_return);
+	oper_return ge(oper_return, oper_return);
+	oper_return gt(oper_return, oper_return);
+	oper_return ne(oper_return, oper_return);
+	oper_return or(oper_return, oper_return);
+	oper_return and(oper_return, oper_return);
 
-int negop(Lexer &lex, oper_return *val);
-
-//oper evaluation helper functions
-
-//binop helpers
-void plus(oper_return, oper_return, oper_return*);
-void multi(oper_return, oper_return, oper_return*);
-void div(oper_return, oper_return, oper_return*);
-void mod(oper_return, oper_return, oper_return*);
-void exp(oper_return, oper_return, oper_return*);
-void eq(oper_return, oper_return, oper_return*);
-void le(oper_return, oper_return, oper_return*);
-void lt(oper_return, oper_return, oper_return*);
-void ge(oper_return, oper_return, oper_return*);
-void gt(oper_return, oper_return, oper_return*);
-void ne(oper_return, oper_return, oper_return*);
-void or(oper_return, oper_return, oper_return*);
-void and(oper_return, oper_return, oper_return*);
-
-//unop helpers
-void not(oper_return, oper_return*);
-void sin(oper_return, oper_return*);
-void cos(oper_return, oper_return*);
-void tan(oper_return, oper_return*);
+	//unop helpers
+	oper_return not(oper_return);
+	oper_return sin(oper_return);
+	oper_return cos(oper_return);
+	oper_return tan(oper_return);
 
 
-void append_ID(Lexer &lex, std::string*);
+	std::string append_ID(Lexer &lex);
 
-void append_CONST(Lexer &lex, std::string*);
+	std::string append_CONST(Lexer &lex);
 
 
-bool is_CONST(int);
+	bool is_CONST(int);
 
-bool is_BINOP(int);
+	bool is_BINOP(int);
 
-bool is_UNOP(int);
+	bool is_UNOP(int);
 
+}
 
 #endif // !PARSER_H
