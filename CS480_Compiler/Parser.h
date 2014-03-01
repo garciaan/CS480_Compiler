@@ -13,7 +13,7 @@
 namespace parser
 {
 
-	enum oper_type { INT, REAL, STRING, BOOL, CODE };
+	enum oper_type { INT, REAL, STRING, BOOL, CODE, ERROR };
 
 	typedef  struct _oper_return{
 		oper_type type;

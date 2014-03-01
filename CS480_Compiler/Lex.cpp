@@ -45,12 +45,25 @@ void Lexer::pop(){
 	queue.pop();
 }
 
+
+bool Lexer::source_empty(){
+
+	if (queue.empty()){
+		int result = tokenize(1);
+		if (result == -1){
+			return true;
+		}
+	}
+
+	return false;
+}
+
 // returns the number of tokens created, or -1 if non were
-int Lexer::tokenize(int num_tokens){
+int Lexer::tokenize(int _num_tokens){
 
 	int line_num = 1;
 	int cur_tokens = 0;
-	num_tokens = num_tokens > 0 ? num_tokens : -1;
+	int num_tokens = _num_tokens > 0 ? _num_tokens : -1;
 
 	string value;
 

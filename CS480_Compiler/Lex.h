@@ -29,6 +29,7 @@ public:
 	Token *peek();
 	int peek_tag();
 	void pop();
+	bool source_empty();
 	int tokenize(int num_tokens);
 
 	const std::queue<lex_mesg>& get_errors();

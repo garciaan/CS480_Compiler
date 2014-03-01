@@ -49,7 +49,7 @@ int main(int argc, char** argv)
 	create_symbol_table(symbol_table);
 
 	for (unsigned i = 0; i < sources.size(); ++i){
-		parse(*sources[i], source_names[i], symbol_table, verbose);
+		parser::parse(*sources[i], source_names[i], symbol_table, verbose);
 	}
 
 
