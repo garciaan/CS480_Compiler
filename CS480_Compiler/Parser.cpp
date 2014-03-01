@@ -214,93 +214,33 @@ parser::oper_return parser::oper_1(Lexer &lex){
 		int bin_op;
 		oper_return oper1;
 		oper_return oper2;
-		binop(lex, &bin_op);
+		bin_op = binop(lex);
 		oper1 = oper(lex);
 		oper2 = oper(lex);
 
 
 		if (oper1.type == CODE || oper2.type == CODE){
-			synth->type = CODE;
-			synth->code = oper1.code + " " + oper2.code + " " + Token::tag_to_input(bin_op);
+			synth.type = CODE;
+			synth.code = oper1.code + " " + oper2.code + " " + Token::tag_to_input(bin_op);
 		}
 		else{
 
-			switch (bin_op)
-			{
-			case PLUS:
-				plus(oper1, oper2, synth);
-				break;
-			case MULTI:
-				multi(oper1, oper2, synth);
-				break;
-			case DIV:
-				div(oper1, oper2, synth);
-				break;
-			case MOD:
-				mod(oper1, oper2, synth);
-				break;
-			case EXP:
-				exp(oper1, oper2, synth);
-				break;
-			case EQ:
-				eq(oper1, oper2, synth);
-				break;
-			case LE:
-				le(oper1, oper2, synth);
-				break;
-			case LT:
-				lt(oper1, oper2, synth);
-				break;
-			case GE:
-				ge(oper1, oper2, synth);
-				break;
-			case GT:
-				gt(oper1, oper2, synth);
-				break;
-			case NE:
-				ne(oper1, oper2, synth);
-				break;
-			case OR:
-				or(oper1, oper2, synth);
-				break;
-			case AND:
-				and(oper1, oper2, synth);
-				break;
-			default:
-				break;
-			}
 		}
 	}
 	else if (is_UNOP(lex.peek_tag())){
 		int un_op;
 		oper_return oper1;
 
-		unop(lex, &un_op);
-		oper(lex, &oper1);
+		unop(lex);
+		oper(lex);
 
 		if (oper1.type == CODE){
-			synth->type = CODE;
-			synth->code = oper1.code + " " +  Token::tag_to_input(un_op);
+			synth.type = CODE;
+			synth.code = oper1.code + " " +  Token::tag_to_input(un_op);
 		}
 		else{
 
-			switch (un_op)
-			{
-			case SIN:
-				sin(oper1, synth);
-				break;
-			case COS:
-				cos(oper1, synth);
-				break;
-			case TAN:
-				tan(oper1, synth);
-				break;
-			case NOT:
-				not(oper1, synth);
-				break;
-			default:
-				break;
-			}
+
 
 		}
 	}
@@ -310,10 +250,10 @@ parser::oper_return parser::oper_1(Lexer &lex){
 		oper_return oper1;
 		oper_return oper2;
 
-		oper(lex, &oper1);
-		negop(lex, &oper2);
+		oper(lex);
+		negop(lex);
 	} else {
-		return -1;
+		return "$";
 	}
 
 	if (lex.peek_tag() == R_BRACKET){
@@ -324,13 +264,35 @@ parser::oper_return parser::oper_1(Lexer &lex){
 	}
 }
 
-int stmt(Lexer &lex, std::string *code){
+parser::oper_return parser::negop(Lexer &lex){
+	if (is_CONST(lex.peek_tag()) || lex.peek_tag() == L_BRACKET || lex.peek_tag() == ID){
+
+		oper_return val;
+		oper(lex);
+		if (lex.peek_tag() == R_BRACKET){
+			lex.pop();
+		}
+		else {
+			return -1;
+		}
+	}
+	else if (lex.peek_tag() == R_BRACKET){
+
+	}
+	else{
+		return -1;
+	}
+	return 0;
+
+}
+
+std::string parser::stmt(Lexer &lex){
 
 	std::string code_0;
 
 	if (lex.peek_tag() == L_BRACKET){
 		lex.pop();
-		stmt_1(lex, &code_0);
+		stmt_1(lex);
 	}
 	else {
 		return -1;
@@ -340,20 +302,20 @@ int stmt(Lexer &lex, std::string *code){
 	return 0;
 }
 
-int stmt_1(Lexer &lex, std::string *code){
+std::string parser::stmt_1(Lexer &lex){
 
 	std::string code_0;
 
 	if (lex.peek_tag() == IF){
 		lex.pop();
-		expr(lex, &code_0);
-		expr(lex, &code_0);
-		ifstmt(lex, &code_0);
+		expr(lex);
+		expr(lex);
+		ifstmt(lex);
 	}
 	else if (lex.peek_tag() == WHILE){
 		lex.pop();
-		expr(lex, code);
-		exprlist(lex, code);
+		expr(lex);
+		exprlist(lex);
 		if (lex.peek_tag() != R_BRACKET){
 			return -1;
 		}
@@ -365,7 +327,7 @@ int stmt_1(Lexer &lex, std::string *code){
 		lex.pop();
 		if (lex.peek_tag() == L_BRACKET){
 			lex.pop();
-			varlist(lex, &code_0);
+			varlist(lex);
 			if (lex.peek_tag() == R_BRACKET){
 				lex.pop();
 			}
@@ -380,7 +342,7 @@ int stmt_1(Lexer &lex, std::string *code){
 	else if (lex.peek_tag() == STDOUT){
 		lex.pop();
 		oper_return val;
-		oper(lex, &val);
+		oper(lex);
 		if (lex.peek_tag() != R_BRACKET){
 			return -1;
 		}
@@ -395,19 +357,19 @@ int stmt_1(Lexer &lex, std::string *code){
 
 }
 
-int binop(Lexer &lex, int *operation){
+int parser::binop(Lexer &lex){
 	if (is_BINOP(lex.peek_tag())){
-		*operation = lex.peek_tag();
+		int return_value = lex.peek_tag();
 		lex.pop();
 	}
 	else {
 		return -1;
 	}
 
-	return 0;
+	return return_value;
 }
 
-int unop(Lexer &lex, int *operation){
+int parser::unop(Lexer &lex){
 	if (is_UNOP(lex.peek_tag())){
 		*operation = lex.peek_tag();
 		lex.pop();
@@ -419,7 +381,7 @@ int unop(Lexer &lex, int *operation){
 	return 0;
 }
 
-int const_0(Lexer &lex, oper_return* synth){
+parser::oper_return parser::const_0(Lexer &lex){
 
 	if (lex.peek_tag() == STRING_L){
 		synth->type = STRING;
@@ -456,7 +418,7 @@ int const_0(Lexer &lex, oper_return* synth){
 	return 0;
 }
 
-std::string ifstmt(Lexer &lex, std::string *code){
+std::string parser::ifstmt(Lexer &lex){
 
 	std::string code_0;
 
@@ -479,7 +441,7 @@ std::string ifstmt(Lexer &lex, std::string *code){
 	}
 }
 
-int exprlist(Lexer &lex, std::string *code){
+std::string parser::exprlist(Lexer &lex){
 
 	std::string code_0;
 
@@ -494,7 +456,7 @@ int exprlist(Lexer &lex, std::string *code){
 	return 0;
 }
 
-int exprlist_1(Lexer &lex, std::string *code){
+std::string parser::exprlist_1(Lexer &lex){
 
 	std::string code_0;
 
@@ -512,7 +474,7 @@ int exprlist_1(Lexer &lex, std::string *code){
 
 }
 
-int varlist(Lexer &lex, std::string *code){
+std::string parser::varlist(Lexer &lex){
 
 	std::string code_0;
 
@@ -539,7 +501,7 @@ int varlist(Lexer &lex, std::string *code){
 	}
 }
 
-int varlist_1(Lexer &lex, std::string *code){
+std::string parser::varlist_1(Lexer &lex){
 
 	std::string code_0;
 
@@ -556,7 +518,7 @@ int varlist_1(Lexer &lex, std::string *code){
 	return 0;
 }
 
-int type(Lexer &lex, std::string *code){
+std::string parser::type(Lexer &lex){
 	if (lex.peek_tag() == BOOL_T || lex.peek_tag() == INT_T ||
 		lex.peek_tag() == REAL_T || lex.peek_tag() == STRING_T){
 		lex.pop();
@@ -568,447 +530,6 @@ int type(Lexer &lex, std::string *code){
 	return 0;
 }
 
-int negop(Lexer &lex, oper_return *code){
-	if (is_CONST(lex.peek_tag()) || lex.peek_tag() == L_BRACKET || lex.peek_tag() == ID){
-
-		oper_return val;
-		oper(lex, &val);
-		if (lex.peek_tag() == R_BRACKET){
-			lex.pop();
-		}
-		else {
-			return - 1;
-		}
-	}
-	else if (lex.peek_tag() == R_BRACKET){
-
-	}
-	else{
-		return -1;
-	}
-	return 0;
-
-}
-
-void plus(oper_return oper1, oper_return oper2, oper_return* synth){
-	//huge bulk of logic here for evaluation
-	//addition and integers
-	if (oper1.type == INT && oper2.type == INT){
-		synth->int_value = oper1.int_value + oper2.int_value;
-		synth->type = INT;
-		synth->code = std::to_string(oper1.int_value + oper2.int_value);
-	}
-	//addition and mixed int/float
-	else if ((oper1.type == INT && oper2.type == REAL)){
-		synth->real_value = (double)oper1.int_value + oper2.real_value;
-		synth->type = REAL;
-		std::stringstream temp;
-		temp << std::scientific << (double)oper1.int_value + oper2.real_value << " ";
-		synth->code = temp.str();
-	}
-	else if ((oper1.type == REAL && oper2.type == INT)){
-		synth->real_value = oper1.real_value + (double)oper2.int_value;
-		synth->type = REAL;
-		std::stringstream temp;
-		temp << std::scientific << oper1.real_value + (double)oper2.int_value << " ";
-		synth->code = temp.str();
-	}
-	else if ((oper1.type == REAL && oper2.type == REAL)){
-		synth->real_value = oper1.real_value + oper2.real_value;
-		synth->type = REAL;
-		std::stringstream temp;
-		temp << std::scientific << oper1.real_value + oper2.real_value << " ";
-		synth->code = temp.str();
-	}
-	//other cases?
-}
-
-void multi(oper_return oper1, oper_return oper2, oper_return *synth){
-	if (oper1.type == INT && oper2.type == INT){
-		synth->int_value = oper1.int_value *  oper2.int_value;
-		synth->type = INT;
-		synth->code = std::to_string(oper1.int_value * oper2.int_value);
-	}
-	//addition and mixed int/float
-	else if ((oper1.type == INT && oper2.type == REAL)){
-		synth->real_value = (double)oper1.int_value * oper2.real_value;
-		synth->type = REAL;
-		std::stringstream temp;
-		temp << std::scientific << (double)oper1.int_value * oper2.real_value << " ";
-		synth->code = temp.str();
-	}
-	else if ((oper1.type == REAL && oper2.type == INT)){
-		synth->real_value = oper1.real_value * (double)oper2.int_value;
-		synth->type = REAL;
-		std::stringstream temp;
-		temp << std::scientific << oper1.real_value * (double)oper2.int_value << " ";
-		synth->code = temp.str();
-	}
-	else if ((oper1.type == REAL && oper2.type == REAL)){
-		synth->real_value = oper1.real_value * oper2.real_value;
-		synth->type = REAL;
-		std::stringstream temp;
-		temp << std::scientific << oper1.real_value * oper2.real_value << " ";
-		synth->code = temp.str();
-	}
-}
-void div(oper_return oper1, oper_return oper2, oper_return *synth){
-
-	if (oper2.type == INT && oper2.int_value == 0 ||
-		oper2.type == REAL && oper2.real_value == 0){
-		//handle divide by zero errors
-	}
-
-
-	if (oper1.type == INT && oper2.type == INT){
-		synth->int_value = oper1.int_value / oper2.int_value;
-		synth->type = INT;
-		synth->code = std::to_string(oper1.int_value / oper2.int_value);
-	}
-	//addition and mixed int/float
-	else if ((oper1.type == INT && oper2.type == REAL)){
-		synth->real_value = (double)oper1.int_value / oper2.real_value;
-		synth->type = REAL;
-		std::stringstream temp;
-		temp << std::scientific << (double)oper1.int_value / oper2.real_value << " ";
-		synth->code = temp.str();
-	}
-	else if ((oper1.type == REAL && oper2.type == INT)){
-		synth->real_value = oper1.real_value / (double)oper2.int_value;
-		synth->type = REAL;
-		std::stringstream temp;
-		temp << std::scientific << oper1.real_value / (double)oper2.int_value << " ";
-		synth->code = temp.str();
-	}
-	else if ((oper1.type == REAL && oper2.type == REAL)){
-		synth->real_value = oper1.real_value / oper2.real_value;
-		synth->type = REAL;
-		std::stringstream temp;
-		temp << std::scientific << oper1.real_value / oper2.real_value << " ";
-		synth->code = temp.str();
-	}
-}
-void mod(oper_return oper1, oper_return oper2, oper_return *synth){
-	if (oper1.type == INT && oper2.type == INT){
-		synth->int_value = oper1.int_value % oper2.int_value;
-		synth->type = INT;
-		synth->code = std::to_string(oper1.int_value % oper2.int_value);
-	}
-	//addition and mixed int/float
-	else if ((oper1.type == INT && oper2.type == REAL)){
-		synth->real_value = fmod((double)oper1.int_value,oper2.real_value);
-		synth->type = REAL;
-		std::stringstream temp;
-		temp << std::scientific << fmod((double)oper1.int_value, oper2.real_value) << " ";
-		synth->code = temp.str();
-	}
-	else if ((oper1.type == REAL && oper2.type == INT)){
-		synth->real_value = fmod(oper1.real_value, (double)oper2.int_value);
-		synth->type = REAL;
-		std::stringstream temp;
-		temp << std::scientific << fmod(oper1.real_value, (double)oper2.int_value) << " ";
-		synth->code = temp.str();
-	}
-	else if ((oper1.type == REAL && oper2.type == REAL)){
-		synth->real_value = fmod(oper1.real_value, oper2.real_value);
-		synth->type = REAL;
-		std::stringstream temp;
-		temp << std::scientific << fmod(oper1.real_value, oper2.real_value) << " ";
-		synth->code = temp.str();
-	}
-}
-void exp(oper_return oper1, oper_return oper2, oper_return *synth){
-	if (oper1.type == INT && oper2.type == INT){
-		synth->int_value = pow(oper1.int_value, oper2.int_value);
-		synth->type = INT;
-		synth->code = std::to_string(pow(oper1.int_value, oper2.int_value));
-	}
-	//addition and mixed int/float
-	else if ((oper1.type == INT && oper2.type == REAL)){
-		synth->real_value = pow((double)oper1.int_value, oper2.real_value);
-		synth->type = REAL;
-		std::stringstream temp;
-		temp << std::scientific << pow((double)oper1.int_value, oper2.real_value) << " ";
-		synth->code = temp.str();
-	}
-	else if ((oper1.type == REAL && oper2.type == INT)){
-		synth->real_value = pow(oper1.real_value, (double)oper2.int_value);
-		synth->type = REAL;
-		std::stringstream temp;
-		temp << std::scientific << pow(oper1.real_value, (double)oper2.int_value) << " ";
-		synth->code = temp.str();
-	}
-	else if ((oper1.type == REAL && oper2.type == REAL)){
-		synth->real_value = pow(oper1.real_value, oper2.real_value);
-		synth->type = REAL;
-		std::stringstream temp;
-		temp << std::scientific << pow(oper1.real_value, oper2.real_value) << " ";
-		synth->code = temp.str();
-	}
-}
-void eq(oper_return oper1, oper_return oper2, oper_return *synth){
-	if (oper1.type == INT && oper2.type == INT){
-		synth->int_value = oper1.int_value == oper2.int_value;
-		synth->type = BOOL;
-		synth->code = (oper1.int_value == oper2.int_value) == 1 ? "true " : "false ";
-	}
-	//addition and mixed int/float
-	else if ((oper1.type == INT && oper2.type == REAL)){
-		synth->real_value = (double)oper1.int_value == oper2.real_value;
-		synth->type = REAL;
-		std::stringstream temp;
-		temp << std::scientific << ((double)oper1.int_value == oper2.real_value) << " ";
-		synth->code = temp.str();
-	}
-	else if ((oper1.type == REAL && oper2.type == INT)){
-		synth->real_value = (oper1.real_value == (double)oper2.int_value);
-		synth->type = REAL;
-		std::stringstream temp;
-		temp << std::scientific << (oper1.real_value == (double)oper2.int_value) << " ";
-		synth->code = temp.str();
-	}
-	else if ((oper1.type == REAL && oper2.type == REAL)){
-		synth->real_value = (oper1.real_value == oper2.real_value);
-		synth->type = REAL;
-		std::stringstream temp;
-		temp << std::scientific << (oper1.real_value == oper2.real_value) << " ";
-		synth->code = temp.str();
-	}
-}
-void le(oper_return oper1, oper_return oper2, oper_return *synth){
-	if (oper1.type == INT && oper2.type == INT){
-		synth->int_value = oper1.int_value == oper2.int_value;
-		synth->type = BOOL;
-		synth->code = (oper1.int_value <= oper2.int_value) == 1 ? "true " : "false ";
-	}
-	//addition and mixed int/float
-	else if ((oper1.type == INT && oper2.type == REAL)){
-		synth->real_value = (double)oper1.int_value <= oper2.real_value;
-		synth->type = REAL;
-		std::stringstream temp;
-		temp << std::scientific << ((double)oper1.int_value <= oper2.real_value) << " ";
-		synth->code = temp.str();
-	}
-	else if ((oper1.type == REAL && oper2.type == INT)){
-		synth->real_value = (oper1.real_value <= (double)oper2.int_value);
-		synth->type = REAL;
-		std::stringstream temp;
-		temp << std::scientific << (oper1.real_value <= (double)oper2.int_value) << " ";
-		synth->code = temp.str();
-	}
-	else if ((oper1.type == REAL && oper2.type == REAL)){
-		synth->real_value = (oper1.real_value <= oper2.real_value);
-		synth->type = REAL;
-		std::stringstream temp;
-		temp << std::scientific << (oper1.real_value <= oper2.real_value) << " ";
-		synth->code = temp.str();
-	}
-}
-void lt(oper_return oper1, oper_return oper2, oper_return *synth){
-	if (oper1.type == INT && oper2.type == INT){
-		synth->int_value = oper1.int_value == oper2.int_value;
-		synth->type = BOOL;
-		synth->code = (oper1.int_value < oper2.int_value) == 1 ? "true " : "false ";
-	}
-	//addition and mixed int/float
-	else if ((oper1.type == INT && oper2.type == REAL)){
-		synth->real_value = (double)oper1.int_value < oper2.real_value;
-		synth->type = REAL;
-		std::stringstream temp;
-		temp << std::scientific << ((double)oper1.int_value < oper2.real_value) << " ";
-		synth->code = temp.str();
-	}
-	else if ((oper1.type == REAL && oper2.type == INT)){
-		synth->real_value = (oper1.real_value < (double)oper2.int_value);
-		synth->type = REAL;
-		std::stringstream temp;
-		temp << std::scientific << (oper1.real_value < (double)oper2.int_value) << " ";
-		synth->code = temp.str();
-	}
-	else if ((oper1.type == REAL && oper2.type == REAL)){
-		synth->real_value = (oper1.real_value < oper2.real_value);
-		synth->type = REAL;
-		std::stringstream temp;
-		temp << std::scientific << (oper1.real_value < oper2.real_value) << " ";
-		synth->code = temp.str();
-	}
-}
-void ge(oper_return oper1, oper_return oper2, oper_return *synth){
-	if (oper1.type == INT && oper2.type == INT){
-		synth->int_value = oper1.int_value == oper2.int_value;
-		synth->type = BOOL;
-		synth->code = (oper1.int_value >= oper2.int_value) == 1 ? "true " : "false ";
-	}
-	//addition and mixed int/float
-	else if ((oper1.type == INT && oper2.type == REAL)){
-		synth->real_value = (double)oper1.int_value >= oper2.real_value;
-		synth->type = REAL;
-		std::stringstream temp;
-		temp << std::scientific << ((double)oper1.int_value >= oper2.real_value) << " ";
-		synth->code = temp.str();
-	}
-	else if ((oper1.type == REAL && oper2.type == INT)){
-		synth->real_value = (oper1.real_value >= (double)oper2.int_value);
-		synth->type = REAL;
-		std::stringstream temp;
-		temp << std::scientific << (oper1.real_value >= (double)oper2.int_value) << " ";
-		synth->code = temp.str();
-	}
-	else if ((oper1.type == REAL && oper2.type == REAL)){
-		synth->real_value = (oper1.real_value >= oper2.real_value);
-		synth->type = REAL;
-		std::stringstream temp;
-		temp << std::scientific << (oper1.real_value >= oper2.real_value) << " ";
-		synth->code = temp.str();
-	}
-}
-void gt(oper_return oper1, oper_return oper2, oper_return *synth){
-	if (oper1.type == INT && oper2.type == INT){
-		synth->int_value = oper1.int_value == oper2.int_value;
-		synth->type = BOOL;
-		synth->code = (oper1.int_value > oper2.int_value) == 1 ? "true " : "false ";
-	}
-	//addition and mixed int/float
-	else if ((oper1.type == INT && oper2.type == REAL)){
-		synth->real_value = (double)oper1.int_value > oper2.real_value;
-		synth->type = REAL;
-		std::stringstream temp;
-		temp << std::scientific << ((double)oper1.int_value > oper2.real_value) << " ";
-		synth->code = temp.str();
-	}
-	else if ((oper1.type == REAL && oper2.type == INT)){
-		synth->real_value = (oper1.real_value > (double)oper2.int_value);
-		synth->type = REAL;
-		std::stringstream temp;
-		temp << std::scientific << (oper1.real_value > (double)oper2.int_value) << " ";
-		synth->code = temp.str();
-	}
-	else if ((oper1.type == REAL && oper2.type == REAL)){
-		synth->real_value = (oper1.real_value > oper2.real_value);
-		synth->type = REAL;
-		std::stringstream temp;
-		temp << std::scientific << (oper1.real_value > oper2.real_value) << " ";
-		synth->code = temp.str();
-	}
-}
-void ne(oper_return oper1, oper_return oper2, oper_return *synth){
-	if (oper1.type == INT && oper2.type == INT){
-		synth->int_value = oper1.int_value == oper2.int_value;
-		synth->type = BOOL;
-		synth->code = (oper1.int_value != oper2.int_value) == 1 ? "true " : "false ";
-	}
-	//addition and mixed int/float
-	else if ((oper1.type == INT && oper2.type == REAL)){
-		synth->real_value = (double)oper1.int_value != oper2.real_value;
-		synth->type = REAL;
-		std::stringstream temp;
-		temp << std::scientific << ((double)oper1.int_value != oper2.real_value) << " ";
-		synth->code = temp.str();
-	}
-	else if ((oper1.type == REAL && oper2.type == INT)){
-		synth->real_value = (oper1.real_value != (double)oper2.int_value);
-		synth->type = REAL;
-		std::stringstream temp;
-		temp << std::scientific << (oper1.real_value != (double)oper2.int_value) << " ";
-		synth->code = temp.str();
-	}
-	else if ((oper1.type == REAL && oper2.type == REAL)){
-		synth->real_value = (oper1.real_value != oper2.real_value);
-		synth->type = REAL;
-		std::stringstream temp;
-		temp << std::scientific << (oper1.real_value != oper2.real_value) << " ";
-		synth->code = temp.str();
-	}
-}
-void or(oper_return oper1, oper_return oper2, oper_return *synth){
-	if (oper1.type == BOOL && oper2.type == BOOL){
-		synth->int_value = (oper1.int_value || oper2.int_value);
-		synth->type = BOOL;
-		synth->code = (oper1.int_value || oper2.int_value) == 1 ? "true " : "false ";
-	}
-	else {
-		//error
-	}
-}
-void and(oper_return oper1, oper_return oper2, oper_return *synth){
-	if (oper1.type == BOOL && oper2.type == BOOL){
-		synth->int_value = (oper1.int_value && oper2.int_value);
-		synth->type = BOOL;
-		synth->code = (oper1.int_value && oper2.int_value) == 1 ? "true " : "false ";
-	}
-	else {
-		//error
-	}
-}
-
-
-void not(oper_return oper, oper_return *synth){
-	if (oper.type == BOOL){
-		synth->int_value = (!oper.int_value);
-		synth->type = BOOL;
-		synth->code = (synth->int_value) > 0 ? "true " : "false ";
-	}
-	else {
-		//error
-	}
-}
-void sin(oper_return oper, oper_return *synth){
-	if (oper.type == REAL){
-		synth->real_value = sin(oper.real_value);
-		synth->type = REAL;
-		std::stringstream temp;
-		temp << std::scientific << (synth->real_value) << " ";
-		synth->code = temp.str();
-	}
-	else if (oper.type == INT){
-		synth->real_value = sin(oper.int_value);
-		synth->type = REAL;
-		std::stringstream temp;
-		temp << std::scientific << (synth->real_value) << " ";
-		synth->code = temp.str();
-	}
-	else {
-		//error
-	}
-}
-void cos(oper_return oper, oper_return *synth){
-	if (oper.type == REAL){
-		synth->real_value = cos(oper.real_value);
-		synth->type = REAL;
-		std::stringstream temp;
-		temp << std::scientific << (synth->real_value) << " ";
-		synth->code = temp.str();
-	}
-	else if (oper.type == INT){
-		synth->real_value = cos(oper.int_value);
-		synth->type = REAL;
-		std::stringstream temp;
-		temp << std::scientific << (synth->real_value) << " ";
-		synth->code = temp.str();
-	}
-	else {
-		//error
-	}
-}
-void tan(oper_return oper, oper_return *synth){
-	if (oper.type == REAL){
-		synth->real_value = tan(oper.real_value);
-		synth->type = REAL;
-		std::stringstream temp;
-		temp << std::scientific << (synth->real_value) << " ";
-		synth->code = temp.str();
-	}
-	else if (oper.type == INT){
-		synth->real_value = tan(oper.int_value);
-		synth->type = REAL;
-		std::stringstream temp;
-		temp << std::scientific << (synth->real_value) << " ";
-		synth->code = temp.str();
-	}
-	else {
-		//error
-	}
-}
 
 std::string parser::append_ID(Lexer &lex){
 	std::string code = ((IdToken*)lex.peek())->get_id() + " ";
@@ -1018,21 +539,21 @@ std::string parser::append_ID(Lexer &lex){
 
 std::string parser::append_CONST(Lexer &lex){
 	oper_return val;
-	const_0(lex, &val);
+	const_0(lex);
 	return val.code;
 }
 
-bool is_CONST(int val){
+bool parser::is_CONST(int val){
 	return (val == INT_L) || (val == REAL_L) || (val == STRING_L)
 		|| (val == TRUE) || (val == FALSE);
 }
 
-bool is_BINOP(int val){
+bool parser::is_BINOP(int val){
 	return (val == AND) || (val == OR) || (val == PLUS) || (val == MULTI) || (val == DIV) ||
 		(val == MOD) || (val == EXP) || (val == EQ) || (val == NE) || (val == LT) ||
 		(val == GT) || (val == LE) || (val == GE);
 }
 
-bool is_UNOP(int val){
+bool parser::is_UNOP(int val){
 	return (val == NOT) || (val == SIN) || (val == COS) || (val == TAN);
 }

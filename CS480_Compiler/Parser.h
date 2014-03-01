@@ -17,9 +17,6 @@ namespace parser
 
 	typedef  struct _oper_return{
 		oper_type type;
-		std::string str_value;
-		int int_value;
-		double real_value;
 		std::string code;
 	}oper_return;
 
@@ -64,36 +61,11 @@ namespace parser
 
 	std::string type(Lexer &lex);
 
-	oper_return negop(Lexer &lex, oper_return *val);
-
-	//oper evaluation helper functions
-
-	//binop helpers
-	oper_return plus(oper_return, oper_return);
-	oper_return multi(oper_return, oper_return);
-	oper_return div(oper_return, oper_return);
-	oper_return mod(oper_return, oper_return);
-	oper_return exp(oper_return, oper_return);
-	oper_return eq(oper_return, oper_return);
-	oper_return le(oper_return, oper_return);
-	oper_return lt(oper_return, oper_return);
-	oper_return ge(oper_return, oper_return);
-	oper_return gt(oper_return, oper_return);
-	oper_return ne(oper_return, oper_return);
-	oper_return or(oper_return, oper_return);
-	oper_return and(oper_return, oper_return);
-
-	//unop helpers
-	oper_return not(oper_return);
-	oper_return sin(oper_return);
-	oper_return cos(oper_return);
-	oper_return tan(oper_return);
-
+	oper_return negop(Lexer &lex);
 
 	std::string append_ID(Lexer &lex);
 
 	std::string append_CONST(Lexer &lex);
-
 
 	bool is_CONST(int);
 

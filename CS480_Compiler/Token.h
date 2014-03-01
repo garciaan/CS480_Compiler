@@ -46,32 +46,6 @@
 #define TAN 34
 #define STDOUT 35
 
-//Non-Terminal Symbols
-//These start at 200 and go through 399
-
-//Start Non-Terminal
-#define NON_START 200
-//S Non-Terminal
-#define NON_S 201
-#define NON_S_1 202
-#define NON_S_2 203
-#define NON_EXPR 204
-#define NON_EXPR_1 205
-#define NON_OPER 206
-#define NON_OPER_1 207
-#define NON_STMT 208
-#define NON_STMT_1 209
-#define NON_BINOP 210
-#define NON_UNOP 211
-#define NON_CONST 212
-#define NON_IFSTMT 213
-#define NON_EXPRLIST 214
-#define NON_EXPRLIST_1 215
-#define NON_VARLIST 216
-#define NON_VARLIST_1 217
-#define NON_TYPE 218
-#define NON_NEGOP 219
-
 #define EMPTY 299
 
 #define LINE_END 300
@@ -127,26 +101,6 @@ Meanings[] =
 	{ STRING_L, "STRING_L", "string_l" },
 	{ LINE_END, "LINE_END", "\n" },
 	{ INPUT_END, "INPUT_END", "$" },
-	{ NON_START, "NON_START", "start" },
-	{ NON_S, "NON_S", "S" },
-	{ NON_S_1, "NON_S_1", "S'" },
-	{ NON_S_2, "NON_S_2", "S''" },
-	{ NON_EXPR, "NON_EXPR", "EXPR" },
-	{ NON_EXPR_1, "NON_EXPR_1", "EXPR'" },
-	{ NON_OPER, "NON_OPER", "OPER" },
-	{ NON_OPER_1, "NON_OPER_1", "OPER'" },
-	{ NON_STMT, "NON_STMT", "STMT" },
-	{ NON_STMT_1, "NON_STMT_1", "STMT'" },
-	{ NON_BINOP, "NON_BINOP", "BINOP" },
-	{ NON_UNOP, "NON_UNOP", "UNOP" },
-	{ NON_CONST, "NON_CONST", "CONST" },
-	{ NON_IFSTMT, "NON_IFSTMT", "IFSTMT" },
-	{ NON_EXPRLIST, "NON_EXPRLIST", "EXPRLIST" },
-	{ NON_EXPRLIST_1, "NON_EXPRLIST_1", "EXPRLIST'" },
-	{ NON_VARLIST, "NON_VARLIST", "VARLIST" },
-	{ NON_VARLIST_1, "NON_VARLIST_1", "VARLIST'" },
-	{ NON_TYPE, "NON_TYPE", "TYPE" },
-	{ NON_NEGOP, "NON_NEGOP", "NEGOP" },
 	{ EMPTY, "EMPTY", "EMPTY" }
 };
 
