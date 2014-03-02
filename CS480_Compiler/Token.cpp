@@ -60,11 +60,11 @@ int Token::get_tag(){
 	return tag;
 }
 
-void Token::set_tag(int _tag){
-	tag = _tag;
+int Token::get_loc(){
+	return loc;
 }
 
-StrToken::StrToken(std::string _str) : Token(STRING_L), value(_str){}
+StrToken::StrToken(std::string _str, int loc) : Token(STRING_L, loc), value(_str){}
 
 std::string StrToken::get_str(){
 	return value;
@@ -74,7 +74,7 @@ void StrToken::print(){
 	std::cout << "<" << tag_to_string(tag) << ", " << value << ">";
 }
 
-IdToken::IdToken(std::string _str) : Token(ID), value(_str){}
+IdToken::IdToken(std::string _str, int loc) : Token(ID, loc), value(_str){}
 
 std::string IdToken::get_id(){
 	return value;
@@ -84,7 +84,7 @@ void IdToken::print(){
 	std::cout << "<" << tag_to_string(tag) << ", " << value << ">";
 }
 
-IntToken::IntToken(std::string _int) : Token(INT_L)
+IntToken::IntToken(std::string _int, int loc) : Token(INT_L, loc)
 {
 	value = atoi(_int.c_str());
 }
@@ -97,7 +97,7 @@ void IntToken::print(){
 	std::cout << "<" << tag_to_string(tag) << ", " << value << ">";
 }
 
-RealToken::RealToken(std::string _real) : Token(REAL_L)
+RealToken::RealToken(std::string _real, int loc) : Token(REAL_L, loc)
 {
 	value = atof(_real.c_str());
 }
@@ -110,7 +110,7 @@ void RealToken::print(){
 	std::cout << "<" << tag_to_string(tag) << ", " << value << ">";
 }
 
-LineToken::LineToken(int _line) : Token(LINE_END)
+LineToken::LineToken(int _line, int loc) : Token(LINE_END, loc)
 {
 	line = _line;
 }

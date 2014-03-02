@@ -10,61 +10,82 @@
 #include "Token.h"
 #include "Lex.h"
 
-namespace parser
+
+class Parser
 {
+
+private:
+
+	Lexer lex;
+	std::ifstream &source;
+	Symbol_Table &table;
+	std::string source_name;
+
+	std::queue<mesg> errors;
+
+	bool fatal_error = false;
+
+public:
 	//var type will not exist in the final implimentation but we use it here as a filler
-	enum oper_type { INT, REAL, STRING, BOOL, ERROR, EMP, VAR };
+	enum oper_type { INT, REAL, STRING, BOOL, ERROR, EMP, VAR, CODE };
 
-	typedef  struct _oper_return{
+	typedef  struct _synth_return{
 		oper_type type;
-		std::string code;
-	}oper_return;
+		std::string attr;
+	}synth_return;
 
-	void parse(std::ifstream &source, std::string source_name, Symbol_Table &table, bool verbose);
 
-	int start(Lexer &lex);
+	Parser(std::ifstream &source, std::string source_name, Symbol_Table &table);
 
-	std::string s(Lexer &lex);
+	std::string parse();
 
-	std::string s_1(Lexer &lex);
+	std::string start();
 
-	std::string s_2(Lexer &lex);
+	std::string s();
 
-	std::string expr(Lexer &lex);
+	std::string s_1();
 
-	std::string expr_1(Lexer &lex);
+	std::string s_2();
 
-	oper_return oper(Lexer &lex);
+	std::string expr();
 
-	oper_return oper_1(Lexer &lex);
+	std::string expr_1();
 
-	std::string stmt(Lexer &lex);
+	synth_return oper();
 
-	std::string stmt_1(Lexer &lex);
+	synth_return oper_1();
 
-	int binop(Lexer &lex);
+	std::string stmt();
 
-	int unop(Lexer &lex);
+	std::string stmt_1();
 
-	oper_return const_0(Lexer &lex);
+	int binop();
 
-	std::string ifstmt(Lexer &lex);
+	int unop();
 
-	std::string exprlist(Lexer &lex);
+	synth_return const_0();
 
-	std::string exprlist_1(Lexer &lex);
+	std::string ifstmt();
 
-	std::string varlist(Lexer &lex);
+	std::string exprlist();
 
-	std::string varlist_1(Lexer &lex);
+	std::string exprlist_1();
 
-	std::string type(Lexer &lex);
+	std::string varlist();
 
-	oper_return negop(Lexer &lex);
+	std::string varlist_1();
 
-	std::string append_ID(Lexer &lex);
+	std::string type();
 
-	std::string append_CONST(Lexer &lex);
+	synth_return negop();
+
+	synth_return append_ID();
+
+	synth_return append_CONST();
+
+	void error(std::string msg);
+
+	std::string locate_err(int);
 
 	bool is_CONST(int);
 
@@ -78,6 +99,6 @@ namespace parser
 
 	bool is_log_BINOP(int);
 
-}
+};
 
 #endif // !PARSER_H

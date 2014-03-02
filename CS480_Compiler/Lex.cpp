@@ -58,11 +58,16 @@ bool Lexer::source_empty(){
 	return false;
 }
 
+int Lexer::get_loc(){
+	return source.tellg();
+}
+
 // returns the number of tokens created, or -1 if non were
 int Lexer::tokenize(int _num_tokens){
 
 	int line_num = 1;
 	int cur_tokens = 0;
+	int loc = 0;
 	int num_tokens = _num_tokens > 0 ? _num_tokens : -1;
 
 	string value;
@@ -81,6 +86,7 @@ int Lexer::tokenize(int _num_tokens){
 			source.ignore();
 		}
 		
+		loc = source.tellg();
 
 		//if we hit the end of the file we are done here
 		if (source.eof()){
@@ -101,11 +107,11 @@ int Lexer::tokenize(int _num_tokens){
 			int attempt = table.insert_symbol(value);
 
 			if (attempt < 0){
-				queue.push(new IdToken(value));
+				queue.push(new IdToken(value, loc));
 				++cur_tokens;
 			}
 			else {
-				queue.push(new Token(attempt));
+				queue.push(new Token(attempt, loc));
 				++cur_tokens;
 			}
 
@@ -157,7 +163,7 @@ int Lexer::tokenize(int _num_tokens){
 			if (value[value.length() - 1] == 'e' || value[value.length() - 1] == 'E'){
 				
 				//create warning message and fix syntax
-				lex_mesg warning;
+				mesg warning;
 				warning.line = line_num;
 				std::ostringstream str;
 				str << "'" << value << "' on line " << line_num << ". Digit must follow e. Appending 0.";
@@ -172,11 +178,11 @@ int Lexer::tokenize(int _num_tokens){
 			if (value.find(".") != string::npos ||
 				value.find("e") != string::npos ||
 				value.find("E") != string::npos){
-				queue.push(new RealToken(value));
+				queue.push(new RealToken(value, loc));
 				++cur_tokens;
 			}
 			else {
-				queue.push(new IntToken(value));
+				queue.push(new IntToken(value, loc));
 				++cur_tokens;
 			}
 
@@ -191,7 +197,7 @@ int Lexer::tokenize(int _num_tokens){
 			}
 			source.ignore();
 
-			queue.push(new StrToken(value));
+			queue.push(new StrToken(value, loc));
 			++cur_tokens;
 
 		}
@@ -203,49 +209,49 @@ int Lexer::tokenize(int _num_tokens){
 			{
 
 			case '[':
-				queue.push(new Token(L_BRACKET));
+				queue.push(new Token(L_BRACKET, loc));
 				++cur_tokens;
 				source.ignore();
 				break;
 			case ']':
-				queue.push(new Token(R_BRACKET));
+				queue.push(new Token(R_BRACKET, loc));
 				++cur_tokens;
 				source.ignore();
 				break;
 			case '+':
-				queue.push(new Token(PLUS));
+				queue.push(new Token(PLUS, loc));
 				++cur_tokens;
 				source.ignore();
 				break;
 			case '-':
-				queue.push(new Token(MINUS));
+				queue.push(new Token(MINUS, loc));
 				++cur_tokens;
 				source.ignore();
 				break;
 			case '*':
-				queue.push(new Token(MULTI));
+				queue.push(new Token(MULTI, loc));
 				++cur_tokens;
 				source.ignore();
 				break;
 			case '/':
-				queue.push(new Token(DIV));
+				queue.push(new Token(DIV, loc));
 				++cur_tokens;
 				source.ignore();
 				break;
 			case '=':
-				queue.push(new Token(EQ));
+				queue.push(new Token(EQ, loc));
 				++cur_tokens;
 				source.ignore();
 				break;
 			case '<':
 				source.ignore();
 				if (source.peek() == '='){
-					queue.push(new Token(LE));
+					queue.push(new Token(LE, loc));
 					++cur_tokens;
 					source.ignore();
 				}
 				else{
-					queue.push(new Token(LT));
+					queue.push(new Token(LT, loc));
 					++cur_tokens;
 				}
 				
@@ -253,30 +259,30 @@ int Lexer::tokenize(int _num_tokens){
 			case '>':
 				source.ignore();
 				if (source.peek() == '='){
-					queue.push(new Token(GE));
+					queue.push(new Token(GE, loc));
 					++cur_tokens;
 					source.ignore();
 				}
 				else{
-					queue.push(new Token(GT));
+					queue.push(new Token(GT, loc));
 					++cur_tokens;
 				}
 				
 				break;
 			case '%':
-				queue.push(new Token(MOD));
+				queue.push(new Token(MOD, loc));
 				++cur_tokens;
 				source.ignore();
 				break;
 			case '^':
-				queue.push(new Token(EXP));
+				queue.push(new Token(EXP, loc));
 				++cur_tokens;
 				source.ignore();
 				break;
 			case ':':
 				source.ignore();
 				if (source.peek() == '='){
-					queue.push(new Token(ASSIGN));
+					queue.push(new Token(ASSIGN, loc));
 					++cur_tokens;
 					source.ignore();
 				}
@@ -284,7 +290,7 @@ int Lexer::tokenize(int _num_tokens){
 			case '!':
 				source.ignore();
 				if (source.peek() == '='){
-					queue.push(new Token(NE));
+					queue.push(new Token(NE, loc));
 					++cur_tokens;
 					source.ignore();
 				}
@@ -306,7 +312,7 @@ int Lexer::tokenize(int _num_tokens){
 				break;
 
 			default:
-				lex_mesg error;
+				mesg error;
 				error.line = line_num;
 				std::ostringstream str;
 				str << "Unparasable symbol '" << source.get() << "' on line " 

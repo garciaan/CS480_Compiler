@@ -111,15 +111,16 @@ class Token
 protected:
 
 	int tag;
+	int loc;
 
 public:
 
-	Token(int _tag) : tag(_tag){}
+	Token(int _tag, int _loc) : tag(_tag), loc(_loc){}
 	Token(){}
 	virtual void print();
 
 	int get_tag();
-	void set_tag(int _tag);
+	int get_loc();
 
 	static std::string tag_to_string(int tag);
 	static int string_to_tag(std::string word);
@@ -132,7 +133,7 @@ class StrToken : public Token
 	std::string value;
 
 public:
-	StrToken(std::string _str);
+	StrToken(std::string _str, int loc);
 	std::string get_str();
 	void print();
 };
@@ -142,7 +143,7 @@ class IdToken : public Token
 	std::string value;
 
 public:
-	IdToken(std::string _str);
+	IdToken(std::string _str, int loc);
 	std::string get_id();
 	void print();
 };
@@ -153,7 +154,7 @@ class IntToken : public Token
 	int value;
 
 public:
-	IntToken(std::string _int);
+	IntToken(std::string _int, int loc);
 	int get_int();
 	void print();
 };
@@ -163,7 +164,7 @@ class RealToken : public Token
 	double value;
 
 public:
-	RealToken(std::string _real);
+	RealToken(std::string _real, int loc);
 	double get_real();
 	void print();
 };
@@ -174,7 +175,7 @@ class LineToken : public Token
 	int line;
 
 public:
-	LineToken(int _line);
+	LineToken(int _line, int loc);
 	void print();
 };
 

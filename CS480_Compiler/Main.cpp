@@ -49,7 +49,8 @@ int main(int argc, char** argv)
 	create_symbol_table(symbol_table);
 
 	for (unsigned i = 0; i < sources.size(); ++i){
-		parser::parse(*sources[i], source_names[i], symbol_table, verbose);
+		Parser parse_0 = Parser(*sources[i], source_names[i], symbol_table);
+		std::cout << parse_0.parse();
 	}
 
 

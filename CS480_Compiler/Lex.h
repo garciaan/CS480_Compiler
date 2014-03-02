@@ -13,10 +13,11 @@
 #include "Token.h"
 #include "Symbol_Table.h"
 
-struct _lex_mesg{
+struct _mesg{
 	int line;
+	int loc;
 	std::string msg;
-} typedef lex_mesg;
+} typedef mesg;
 
 
 
@@ -30,18 +31,20 @@ public:
 	int peek_tag();
 	void pop();
 	bool source_empty();
+	int get_loc();
+
 	int tokenize(int num_tokens);
 
-	const std::queue<lex_mesg>& get_errors();
-	const std::queue<lex_mesg>& get_warnings();
+	const std::queue<mesg>& get_errors();
+	const std::queue<mesg>& get_warnings();
 
 private:
 
 	std::istream &source;
 	Symbol_Table &table;
 	std::queue<Token*> queue; 
-	std::queue<lex_mesg> errors;
-	std::queue<lex_mesg> warnings;
+	std::queue<mesg> errors;
+	std::queue<mesg> warnings;
 
 };
 
