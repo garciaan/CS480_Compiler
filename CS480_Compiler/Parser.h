@@ -12,14 +12,13 @@
 
 namespace parser
 {
-
-	enum oper_type { INT, REAL, STRING, BOOL, CODE, ERROR };
+	//var type will not exist in the final implimentation but we use it here as a filler
+	enum oper_type { INT, REAL, STRING, BOOL, ERROR, EMP, VAR };
 
 	typedef  struct _oper_return{
 		oper_type type;
 		std::string code;
 	}oper_return;
-
 
 	void parse(std::ifstream &source, std::string source_name, Symbol_Table &table, bool verbose);
 
@@ -72,6 +71,12 @@ namespace parser
 	bool is_BINOP(int);
 
 	bool is_UNOP(int);
+
+	bool is_bool_BINOP(int);
+
+	bool is_real_int_BINOP(int);
+
+	bool is_log_BINOP(int);
 
 }
 

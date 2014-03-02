@@ -145,73 +145,73 @@ std::string parser::s_2(Lexer &lex){
 
 std::string parser::expr(Lexer &lex){
 
-	std::string code;
+	std::string synth;
 
 	if (lex.peek_tag() == L_BRACKET){
 		lex.pop();
-		code += expr_1(lex);
+		synth += expr_1(lex);
 	}
 	else if (lex.peek_tag() == ID){
-		code += append_ID(lex);
+		synth += append_ID(lex);
 	}
 	else if (is_CONST(lex.peek_tag())){
-		code += append_CONST(lex);
+		synth += append_CONST(lex);
 	}
 	else {
 		//error
 		return "$";
 	}
 
-	return code;
+	return synth;
 }
 
 std::string parser::expr_1(Lexer &lex){
 
-	std::string code;
+	std::string synth;
 
 	if ((lex.peek_tag() == ASSIGN) || is_BINOP(lex.peek_tag()) || lex.peek_tag() == MINUS
 		|| is_UNOP(lex.peek_tag())){
 		oper_return val;
 		val = oper_1(lex);
-		code += val.code;
+		synth += val.code;
 	}
 	else if ((lex.peek_tag() == IF) || (lex.peek_tag() == WHILE) || (lex.peek_tag() == LET)){
-		code += stmt_1(lex);
+		synth += stmt_1(lex);
 	}
 	else if (lex.peek_tag() == STDOUT){
-		code += s_1(lex);
+		synth += s_1(lex);
 	}
 	else {
 		//error
 		return "$";
 	}
 
-	return code;
+	return synth;
 }
 
 parser::oper_return parser::oper(Lexer &lex){
 
-	oper_return val;
+	oper_return synth;
 
 	if (lex.peek_tag() == L_BRACKET){
 		lex.pop();
-		val = oper_1(lex);
+		synth = oper_1(lex);
 	}
 	else if (lex.peek_tag() == ID){
 
-		val.type = CODE;
-		val.code = ((IdToken*)lex.peek())->get_id();
+		synth.type = VAR; 
+		synth.code = ((IdToken*)lex.peek())->get_id();
 
 		lex.pop();
 	}
 	else if (is_CONST(lex.peek_tag())){
-		val = const_0(lex);
+		synth = const_0(lex);
 	}
 	else {
-		val.code = '$';
+		synth.type = ERROR;
 	}
 
-	return val;
+	return synth;
 }
 
 parser::oper_return parser::oper_1(Lexer &lex){
@@ -236,12 +236,56 @@ parser::oper_return parser::oper_1(Lexer &lex){
 		oper1 = oper(lex);
 		oper2 = oper(lex);
 
-
-		if (oper1.type == CODE || oper2.type == CODE){
-			synth.type = CODE;
-			synth.code = oper1.code + " " + oper2.code + " " + Token::tag_to_input(bin_op);
+		if (is_bool_BINOP(bin_op)){
+			if (oper1.type == BOOL && oper2.type == BOOL){
+				synth.type = BOOL;
+				synth.code = oper1.code + oper2.code;
+			}
+			else {
+				//error
+			}
 		}
-		
+		else if (is_real_int_BINOP(bin_op)){
+			if (oper1.type == INT && oper2.type == INT && bin_op == EXP){
+				synth.type = INT;
+				synth.code = oper1.code + "s>f " + oper2.code + "s>f " + "f** f>s ";
+			}
+			else if (oper1.type == REAL && oper2.type == REAL){
+				synth.type = REAL;
+				synth.code = oper1.code + oper2.code + "f" + Token::tag_to_input(bin_op) + " ";
+			}
+			else if (oper1.type == REAL && oper2.type == INT){
+				synth.type = REAL;
+				synth.code = oper1.code + oper2.code + "s>f " + "f" + Token::tag_to_input(bin_op) + " ";
+			}
+			else if (oper1.type == INT && oper2.type == REAL){
+				synth.type = REAL;
+				synth.code = oper1.code + "s>f " + oper2.code + "f" + Token::tag_to_input(bin_op) + " ";
+			}
+			else if (oper1.type == INT && oper2.type == INT){
+				synth.type = INT;
+				synth.code = oper1.code + oper2.code + Token::tag_to_input(bin_op) + " ";
+			}
+		}
+		else if (is_log_BINOP(bin_op)){
+			if (oper1.type == REAL && oper2.type == REAL){
+				synth.type = BOOL;
+				synth.code = oper1.code + oper2.code + "f" + Token::tag_to_input(bin_op) + " ";
+			}
+			else if (oper1.type == REAL && oper2.type == INT){
+				synth.type = BOOL;
+				synth.code = oper1.code + oper2.code + "s>f " + "f" + Token::tag_to_input(bin_op) + " ";
+			}
+			else if (oper1.type == INT && oper2.type == REAL){
+				synth.type = BOOL;
+				synth.code = oper1.code + "s>f " + oper2.code + "f" + Token::tag_to_input(bin_op) + " ";
+			}
+			else if (oper1.type == INT && oper2.type == INT){
+				synth.type = BOOL;
+				synth.code = oper1.code + oper2.code + Token::tag_to_input(bin_op) + " ";
+			}
+		}
+
 	}
 	else if (is_UNOP(lex.peek_tag())){
 		int un_op;
@@ -250,24 +294,55 @@ parser::oper_return parser::oper_1(Lexer &lex){
 		un_op = unop(lex);
 		oper1 = oper(lex);
 
-		if (oper1.type == CODE){
-			synth.type = CODE;
-			synth.code = oper1.code + " " +  Token::tag_to_input(un_op);
+		if (oper1.type == BOOL && un_op == NOT){
+			synth.type = BOOL;
+			synth.code = oper1.code + "invert ";
 		}
-		else{
-
-
-
+		else if (oper1.type == INT){
+			synth.type = REAL;
+			synth.code = oper1.code + "s>f " + Token::tag_to_input(un_op) + " ";
 		}
+		else if (oper1.type == REAL){
+			synth.type = REAL;
+			synth.code = oper1.code + Token::tag_to_input(un_op) + " ";
+		}
+
 	}
 	else if (lex.peek_tag() == MINUS){
 		lex.pop();
 
-		oper_return oper1;
-		oper_return oper2;
+		oper_return oper1 = oper(lex);
+		oper_return oper2 = negop(lex);
 
-		oper(lex);
-		negop(lex);
+		if (oper2.type == EMP){
+			if (oper1.type == REAL){
+				synth.type == REAL;
+				synth.code = oper1.code + "fnegate ";
+			}
+			else if (oper1.type == INT){
+				synth.type = INT;
+				synth.code = oper1.code + "negate ";
+			}
+		}
+		else {
+			if (oper1.type == REAL && oper2.type == REAL){
+				synth.type = REAL;
+				synth.code = oper1.code + oper2.code + "f- ";
+			}
+			else if (oper1.type == REAL && oper2.type == INT){
+				synth.type = REAL;
+				synth.code = oper1.code + oper2.code + "s>f f- ";
+			}
+			else if (oper1.type == INT && oper2.type == REAL){
+				synth.type = REAL;
+				synth.code = oper1.code + "s>f " + oper2.code + "f- ";
+			}
+			else if (oper1.type == INT && oper2.type == INT){
+				synth.type = REAL;
+				synth.code = oper1.code + oper2.code + "- ";
+			}
+		}
+		
 	} else {
 		synth.type = ERROR;
 	}
@@ -286,26 +361,16 @@ parser::oper_return parser::negop(Lexer &lex){
 
 	oper_return synth;
 
-
 	if (is_CONST(lex.peek_tag()) || lex.peek_tag() == L_BRACKET || lex.peek_tag() == ID){
-
-		oper_return val;
-		oper(lex);
-		if (lex.peek_tag() == R_BRACKET){
-			lex.pop();
-		}
-		else {
-			synth.type = ERROR;
-		}
+		synth = oper(lex);
 	}
 	else if (lex.peek_tag() == R_BRACKET){
-
+		synth.type = EMP;
 	}
-	else{
+	else {
 		synth.type = ERROR;
 	}
-
-
+	
 	return synth;
 
 }
@@ -571,11 +636,25 @@ bool parser::is_CONST(int val){
 }
 
 bool parser::is_BINOP(int val){
-	return (val == AND) || (val == OR) || (val == PLUS) || (val == MULTI) || (val == DIV) ||
-		(val == MOD) || (val == EXP) || (val == EQ) || (val == NE) || (val == LT) ||
-		(val == GT) || (val == LE) || (val == GE);
+	return is_bool_BINOP(val) || is_real_int_BINOP(val)
+		|| is_log_BINOP(val);
 }
 
 bool parser::is_UNOP(int val){
 	return (val == NOT) || (val == SIN) || (val == COS) || (val == TAN);
+}
+
+bool parser::is_real_int_BINOP(int val){
+	return (val == PLUS) || (val == MULTI) || (val == DIV) ||
+		(val == MOD) || (val == EXP);
+}
+
+bool parser::is_bool_BINOP(int val){
+	return (val == AND) || (val == OR);
+}
+
+bool parser::is_log_BINOP(int val){
+	return (val == EQ) || (val == NE) || (val == LT) ||
+		(val == GT) || (val == LE) || (val == GE);
+
 }
