@@ -1,9 +1,11 @@
 #include "Parser.h"
 
 
-
+//Constructor
 Parser::Parser(std::ifstream &_source, std::string _source_name, Symbol_Table &_table) : source(_source), source_name(_source_name), table(_table), lex(_source, _table) {}
 
+
+//beginning or our recursive desent 
 std::string Parser::parse(){
 
 	std::stringstream add;
@@ -44,6 +46,7 @@ std::string Parser::start(){
 
 	std::stringstream add;
 
+	//we wrap our code in a function "main"
 	add << ": main " << std::endl;
 
 	if (lex.peek_tag() == L_BRACKET){
@@ -53,6 +56,7 @@ std::string Parser::start(){
 		error("Code did not begin with left bracket '['. Inserting left bracket to continue parse.");
 	}
 
+	//countiune recursive desent 
 	add << s();
 
 	if (lex.peek_tag() == R_BRACKET){
@@ -84,7 +88,6 @@ std::string Parser::s(){
 	if (lex.peek_tag() == L_BRACKET){
 		pop_lex(add);
 		add << s_2();
-
 
 	}
 	else if (lex.peek_tag() == ID){
