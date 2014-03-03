@@ -3,13 +3,10 @@
 	[while id id]
 	[while id id id id id id ]
 	[while id id id id id id id id id]
-	[if [or id id][:= id 3][+ id 5]]
-	[if [or id id][:= id 3]]
-	[let [[id string]]]
-	[let [[id string][id bool][id int][id real]]]
+	[if [or id id][+ id 3][+ id 5]]
+	[if [or id id][+ id 3]]
 
 	[stdout "stdout test"]
-	[:= id 6]
 
 	# binop tests
 	[+ 3 5]

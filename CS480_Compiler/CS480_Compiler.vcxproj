@@ -71,7 +71,6 @@
     <ClCompile Include="Token.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Generation.h" />
     <ClInclude Include="Lex.h" />
     <ClInclude Include="Parser.h" />
     <ClInclude Include="Symbol_Table.h" />

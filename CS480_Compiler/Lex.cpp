@@ -118,7 +118,19 @@ int Lexer::tokenize(int _num_tokens){
 		}
 
 		//numbers
-		else if (isdigit(source.peek()) || source.peek() == '.'){
+		else if (isdigit(source.peek()) || source.peek() == '.' || source.peek() == '-'){
+
+			if (source.peek() == '-'){
+				source.ignore();
+				if (source.peek() == ' '){
+					queue.push(new Token(MINUS, loc));
+					++cur_tokens;
+					continue;
+				}
+				else {
+					value.append(1, '-');
+				}
+			}
 
 
 			//while we have just digits, get the digits
@@ -305,7 +317,8 @@ int Lexer::tokenize(int _num_tokens){
 				line_num++;
 				break;
 			case '\n':
-				//queue.push(new LineToken(line_num++));
+				queue.push(new LineToken(line_num++, loc));
+				++cur_tokens;
 				source.ignore();
 				break;
 			case ' ':

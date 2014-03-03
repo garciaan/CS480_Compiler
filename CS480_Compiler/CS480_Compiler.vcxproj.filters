@@ -41,9 +41,6 @@
     <ClInclude Include="Symbol_Table.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Generation.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Parser.h">
       <Filter>Header Files</Filter>
     </ClInclude>

@@ -27,7 +27,7 @@ private:
 
 public:
 	//var type will not exist in the final implimentation but we use it here as a filler
-	enum oper_type { INT, REAL, STRING, BOOL, ERROR, EMP, VAR, CODE };
+	enum oper_type { INT, REAL, STRING, BOOL, ERROR, EMP };
 
 	typedef  struct _synth_return{
 		oper_type type;
@@ -47,17 +47,17 @@ public:
 
 	std::string s_2();
 
-	std::string expr();
+	synth_return expr();
 
-	std::string expr_1();
+	synth_return expr_1();
 
 	synth_return oper();
 
 	synth_return oper_1();
 
-	std::string stmt();
+	synth_return stmt();
 
-	std::string stmt_1();
+	synth_return stmt_1();
 
 	int binop();
 
@@ -65,23 +65,25 @@ public:
 
 	synth_return const_0();
 
-	std::string ifstmt();
+	synth_return ifstmt();
 
-	std::string exprlist();
+	synth_return exprlist();
 
-	std::string exprlist_1();
+	synth_return exprlist_1();
 
-	std::string varlist();
+	synth_return varlist();
 
-	std::string varlist_1();
+	synth_return varlist_1();
 
-	std::string type();
+	synth_return type();
 
 	synth_return negop();
 
 	synth_return append_ID();
 
 	synth_return append_CONST();
+
+	void pop_lex(std::stringstream&);
 
 	void error(std::string msg);
 
