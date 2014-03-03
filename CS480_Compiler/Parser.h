@@ -7,6 +7,7 @@
 #include <queue>
 #include <vector>
 #include <cmath>
+#include <limits>
 #include "Token.h"
 #include "Lex.h"
 
@@ -23,7 +24,7 @@ private:
 
 	std::queue<mesg> errors;
 
-	bool fatal_error = false;
+	bool fatal_error;
 
 public:
 	//var type will not exist in the final implimentation but we use it here as a filler

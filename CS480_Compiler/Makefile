@@ -19,32 +19,17 @@ clean:
 	rm -f $(OBJS) compiler *.out
 	ls
 
-stutest_pass.out: compiler
-	cat stutest_pass.in
-	-compiler $(RUNFLAGS) stutest_pass.in > stutest_pass.out
-	cat stutest_pass.out
+pass_test.out: compiler
+	cat Pass_Test.txt; 
+	-compiler $(RUNFLAGS) Pass_Test.txt -v > Pass_Test.out;
+	cat Pass_Test.out;
 	
-stutest_fail.out: compiler
-	cat stutest_fail_1.in;
-	-compiler $(RUNFLAGS) stutest_fail_1.in -v > stutest_fail_1.out;
-	cat stutest_fail_1.out;
+fail_test.out: compiler
+	cat Fail_Test.txt;
+	-compiler $(RUNFLAGS) Fail_Test.txt -v > Fail_Test.out;
+	cat Fail_Test.out;
 
-	cat stutest_fail_2.in;
-	-compiler $(RUNFLAGS) stutest_fail_2.in -v > stutest_fail_2.out;
-	cat stutest_fail_2.out;
-	
-	cat stutest_fail_3.in;
-	-compiler $(RUNFLAGS) stutest_fail_3.in -v > stutest_fail_3.out;
-	cat stutest_fail_3.out;
-	
-	cat stutest_fail_4.in;
-	-compiler $(RUNFLAGS) stutest_fail_4.in -v > stutest_fail_4.out;
-	cat stutest_fail_4.out;
-	
-	cat stutest_fail_5.in;
-	-compiler $(RUNFLAGS) stutest_fail_5.in -v > stutest_fail_5.out;
-	cat stutest_fail_5.out;
-	
+		
 # Notice the next line. The `-' says to ignore the return code. This
 # is a way to have multiple tests of errors that cause non-zero return
 # codes.
