@@ -26,7 +26,7 @@ std::string Parser::parse(){
 		while (!errors.empty()){
 
 			std::cout << errors.front().msg << std::endl;
-			std::cout << locate_err(errors.front().loc);
+			//std::cout << locate_err(errors.front().loc);
 			errors.pop();
 		}
 	}
@@ -67,7 +67,7 @@ std::string Parser::start(){
 	//add closing line to file
 	add << std::endl << "bye" << std::endl;
 
-	if (!lex.source_empty()){
+	if (!lex.source_empty() && !fatal_error){
 		error("Unprocessed input remaining after parse.");
 	}
 
@@ -293,7 +293,10 @@ Parser::synth_return Parser::oper_1(){
 				add << oper1.attr << oper2.attr;
 			}
 			else {
-				//error
+				error("Operands of type " + oper_to_string(oper1.type) + " and " + oper_to_string(oper2.type) +
+					" have no defintion for operation " + Token::tag_to_string(bin_op));
+				fatal_error = true;
+				return synth;
 			}
 		}
 		else{
@@ -316,6 +319,12 @@ Parser::synth_return Parser::oper_1(){
 			else if (oper1.type == INT && oper2.type == INT){
 				synth.type = is_log_BINOP(bin_op) ? BOOL : INT;
 				add << oper1.attr << oper2.attr << Token::tag_to_input(bin_op) << " ";
+			}
+			else {
+				error("Operands of type " + oper_to_string(oper1.type) + " and " + oper_to_string(oper2.type) +
+					" have no defintion for operation " + Token::tag_to_string(bin_op));
+				fatal_error = true;
+				return synth;
 			}
 		}
 	}
@@ -371,7 +380,7 @@ Parser::synth_return Parser::oper_1(){
 				add << oper1.attr << "s>f " << oper2.attr << "f- ";
 			}
 			else if (oper1.type == INT && oper2.type == INT){
-				synth.type = REAL;
+				synth.type = INT;
 				add << oper1.attr << oper2.attr << "- ";
 			}
 		}
@@ -460,6 +469,7 @@ Parser::synth_return Parser::stmt_1(){
 			add << "else ";
 			add << synth.attr;
 		}
+		add << "endif ";
 
 	}
 	else if (lex.peek_tag() == WHILE){
@@ -473,7 +483,7 @@ Parser::synth_return Parser::stmt_1(){
 		}
 		add << "begin " << synth.attr << "while ";
 		synth = exprlist();
-		add << synth.attr;
+		add << synth.attr << "repeat ";
 	}
 	else if (lex.peek_tag() == LET){
 		pop_lex(add);
@@ -510,6 +520,9 @@ Parser::synth_return Parser::stmt_1(){
 			add << "f. ";
 			break;
 		case INT:
+			add << ". ";
+			break;
+		case BOOL:
 			add << ". ";
 			break;
 		default:
@@ -569,11 +582,12 @@ Parser::synth_return Parser::const_0(){
 	synth_return synth;
 	std::stringstream add;
 
+
 	if (fatal_error) return synth;
 
 	if (lex.peek_tag() == STRING_L){
 		synth.type = STRING;
-		add << "\"" << ((StrToken*)lex.peek())->get_str() << "\" ";
+		add << "s\" " << ((StrToken*)lex.peek())->get_str() << "\" ";
 	}
 	else if (lex.peek_tag() == INT_L){
 		synth.type = INT;
@@ -581,7 +595,12 @@ Parser::synth_return Parser::const_0(){
 	}
 	else if (lex.peek_tag() == REAL_L){
 		synth.type = REAL;
-		add << std::scientific  << ((RealToken*)lex.peek())->get_real() << " ";
+		double val = ((RealToken*)lex.peek())->get_real();
+
+		add << std::fixed
+			<< std::scientific;
+		add.precision(std::numeric_limits<double>::digits10 + 1);
+		add	<< val << " ";
 	}
 	else if (lex.peek_tag() == TRUE){
 		synth.type = BOOL;
@@ -590,6 +609,10 @@ Parser::synth_return Parser::const_0(){
 	else if (lex.peek_tag() == FALSE){
 		synth.type = BOOL;
 		add << "false ";
+	}
+	else if (lex.peek_tag() == NEWLINE){
+		synth.type = EXT;
+		add << "cr ";
 	}
 	else {
 		error("Syntax error."); 
@@ -804,42 +827,6 @@ void Parser::error(std::string msg){
 	errors.push(error_mesg);
 }
 
-std::string Parser::locate_err(int loc){
-
-	std::stringstream ret;
-
-	std::ifstream *loc_stream = new std::ifstream(source_name);
-	//loc_stream.seekg(loc);
-	int start = loc - 35 > 0 ? loc - 35 : 0;
-	//while (loc_stream.peek() != '\n'){
-	//	source.seekg(source.tellg() - (std::streampos)start);
-	//	start -= 1;
-	//}
-	//start = loc_stream.tellg();
-
-	//loc_stream.seekg(loc);
-	loc_stream->seekg(0, std::ios_base::end);
-	int stop = loc + 35 < loc_stream->tellg() ? loc + 35 : loc_stream->tellg();
-	//while (loc_stream.peek() != '\n'){
-	//	source.seekg(source.tellg() + (std::streampos)stop);
-	//	stop += 1;
-	//}
-	//stop = loc_stream.tellg();
-	for (int i = start; i < stop; ++i){
-		loc_stream->seekg(i);
-		ret << (char)loc_stream->peek();
-	}
-
-	ret << std::endl;
-
-	for (int i = start; i < loc; ++i){
-		ret << " ";
-	}
-	ret << "^" << std::endl;;
-
-	return ret.str();
-
-}
 
 void Parser::pop_lex(std::stringstream &str){
 	lex.pop();
@@ -852,7 +839,7 @@ void Parser::pop_lex(std::stringstream &str){
 
 bool Parser::is_CONST(int val){
 	return (val == INT_L) || (val == REAL_L) || (val == STRING_L)
-		|| (val == TRUE) || (val == FALSE);
+		|| (val == TRUE) || (val == FALSE) || (val == NEWLINE);
 }
 
 bool Parser::is_BINOP(int val){
@@ -876,5 +863,27 @@ bool Parser::is_bool_BINOP(int val){
 bool Parser::is_log_BINOP(int val){
 	return (val == EQ) || (val == NE) || (val == LT) ||
 		(val == GT) || (val == LE) || (val == GE);
+
+}
+
+std::string Parser::oper_to_string(oper_type op){
+
+	switch (op){
+	case INT:
+		return "int";
+	case REAL:
+		return "real";
+	case STRING:
+		return "string";
+	case BOOL:
+		return "bool";
+	case EMP:
+		return "empty";
+	case ERROR:
+		return "error";
+	default:
+		return "unkown";
+
+	}
 
 }

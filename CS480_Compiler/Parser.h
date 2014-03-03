@@ -27,7 +27,7 @@ private:
 
 public:
 	//var type will not exist in the final implimentation but we use it here as a filler
-	enum oper_type { INT, REAL, STRING, BOOL, ERROR, EMP };
+	enum oper_type { INT, REAL, STRING, BOOL, ERROR, EMP, EXT };
 
 	typedef  struct _synth_return{
 		oper_type type;
@@ -87,8 +87,6 @@ public:
 
 	void error(std::string msg);
 
-	std::string locate_err(int);
-
 	bool is_CONST(int);
 
 	bool is_BINOP(int);
@@ -100,6 +98,8 @@ public:
 	bool is_real_int_BINOP(int);
 
 	bool is_log_BINOP(int);
+
+	std::string oper_to_string(oper_type);
 
 };
 

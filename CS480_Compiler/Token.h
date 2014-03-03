@@ -45,6 +45,7 @@
 #define COS 33
 #define TAN 34
 #define STDOUT 35
+#define NEWLINE 36
 
 #define EMPTY 299
 

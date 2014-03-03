@@ -1,0 +1,113 @@
+[
+
+	
+	#test of our precision
+	[stdout [sin 3.14159265359]]
+
+	$
+
+	#control tests
+	[if 
+		[< 3 5] 
+		[stdout "IF"]
+		[stdout "ELSE"]
+	]
+
+	[if 
+		[< 3 2] 
+		[stdout " IF"]
+		[stdout " ELSE"]
+	]
+
+	[while
+		[< 3 2]
+		[stdout "loop"]
+	]
+
+	$
+
+	#operation tests
+	[stdout [+ 3 5]]
+	[stdout [- 3 5]]
+	[stdout [* 3 5]]
+	[stdout [/ 3 5]]
+	[stdout [% 3 5]]
+	[stdout [^ 3 5]]
+
+	$
+
+	[stdout [+ 3.0 5]]
+	[stdout [- 3 5.0]]
+	[stdout [* 3.0 5]]
+	[stdout [/ 3 5.0]]
+	[stdout [% 3.0 5]]
+	[stdout [^ 3 5.0]]
+
+	$
+
+	[stdout [+ 3.0 5.0]]
+	[stdout [- 3.0 5.0]]
+	[stdout [* 3.0 5.0]]
+	[stdout [/ 3.0 5.0]]
+	[stdout [% 3.0 5.0]]
+	[stdout [^ 3.0 5.0]]
+
+	$
+
+	#boolean operators
+	[stdout [< 3 5]]
+	[stdout [> 3 5]]
+	[stdout [= 3 5]]
+	[stdout [>= 3 5]]
+	[stdout [<= 3 5]]
+	[stdout [!= 3 5]]
+
+	$
+
+	[stdout [< 3.0 5]]
+	[stdout [> 3 5.0]]
+	[stdout [= 3.0 5]]
+	[stdout [>= 3 5.0]]
+	[stdout [<= 3.0 5]]
+	[stdout [!= 3 5.0]]
+
+	$
+
+	[stdout [< 3.0 5.0]]
+	[stdout [> 3.0 5.0]]
+	[stdout [= 3.0 5.0]]
+	[stdout [>= 3.0 5.0]]
+	[stdout [<= 3.0 5.0]]
+	[stdout [!= 3.0 5.0]]
+
+	$
+
+	[stdout [and true false]]
+	[stdout [and true true]]
+
+	$
+
+	[stdout [or false false]]
+	[stdout [or true false]]
+
+	$
+
+	#unary operators
+	[stdout [not true]]
+
+	$
+
+	[stdout [sin 3]]
+	[stdout [cos 3]]
+	[stdout [tan 3]]
+
+	$
+
+	[stdout [sin 3.5]]
+	[stdout [cos 3.5]]
+	[stdout [tan 3.5]]
+	
+	$
+
+
+]

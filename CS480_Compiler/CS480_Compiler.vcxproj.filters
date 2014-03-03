@@ -46,14 +46,12 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="Pass_Test_1.txt">
-      <Filter>Resource Files</Filter>
-    </Text>
-    <Text Include="Pass_Test_2.txt">
-      <Filter>Resource Files</Filter>
-    </Text>
     <Text Include="Fail_Test_1.txt">
       <Filter>Resource Files</Filter>
     </Text>
+    <Text Include="Pass_Test.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
+    <Text Include="Fail_Test.txt" />
   </ItemGroup>
 </Project>

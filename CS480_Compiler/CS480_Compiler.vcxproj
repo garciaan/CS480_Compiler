@@ -77,9 +77,9 @@
     <ClInclude Include="Token.h" />
   </ItemGroup>
   <ItemGroup>
+    <Text Include="Fail_Test.txt" />
     <Text Include="Fail_Test_1.txt" />
-    <Text Include="Pass_Test_1.txt" />
-    <Text Include="Pass_Test_2.txt" />
+    <Text Include="Pass_Test.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

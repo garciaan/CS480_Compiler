@@ -59,6 +59,7 @@ bool Lexer::source_empty(){
 }
 
 int Lexer::get_loc(){
+
 	return source.tellg();
 }
 
@@ -306,6 +307,12 @@ int Lexer::tokenize(int _num_tokens){
 					++cur_tokens;
 					source.ignore();
 				}
+				break;
+				//non-standard line-break
+			case '$':
+				queue.push(new Token(NEWLINE, loc));
+				++cur_tokens;
+				source.ignore();
 				break;
 				//non-standard comment 
 			case '#':
