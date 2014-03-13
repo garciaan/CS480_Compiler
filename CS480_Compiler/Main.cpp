@@ -1,6 +1,4 @@
-
 #include "Parser.h"
-
 
 
 int main(int argc, char** argv)
@@ -43,13 +41,8 @@ int main(int argc, char** argv)
 	}
 
 
-
-	Symbol_Table symbol_table;
-
-	create_symbol_table(symbol_table);
-
 	for (unsigned i = 0; i < sources.size(); ++i){
-		Parser parse_0 = Parser(*sources[i], source_names[i], symbol_table);
+		Parser parse_0 = Parser(*sources[i], source_names[i]);
 		std::cout << parse_0.parse();
 	}
 

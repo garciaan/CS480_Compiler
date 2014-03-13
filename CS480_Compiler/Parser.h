@@ -18,7 +18,6 @@ private:
 
 	Lexer lex;
 	std::ifstream &source;
-	Symbol_Table &table;
 	std::string source_name;
 
 	std::queue<mesg> errors;
@@ -35,7 +34,7 @@ public:
 	}synth_return;
 
 
-	Parser(std::ifstream &source, std::string source_name, Symbol_Table &table);
+	Parser(std::ifstream &source, std::string source_name);
 
 	std::string parse();
 
@@ -78,6 +77,8 @@ public:
 	synth_return type();
 
 	synth_return negop();
+
+	synth_return append_ID_let();
 
 	synth_return append_ID();
 

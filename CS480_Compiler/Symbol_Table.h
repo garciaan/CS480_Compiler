@@ -16,14 +16,7 @@ struct _symbol{
 
 }typedef Symbol;
 
-//setup symbol table
-static std::string inital_syms[] = { "true", "false", "and", "or", "not", "bool",
-"int", "real", "string", "let", "if", "while", "sin", "cos", "tan",
-"stdout"
-};
 
-static int inital_values[] = { TRUE, FALSE, AND, OR, NOT, BOOL_T, INT_T, REAL_T,
-STRING_T, LET, IF, WHILE, SIN, COS, TAN, STDOUT };
 
 
 class Symbol_Table{
