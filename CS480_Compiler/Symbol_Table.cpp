@@ -1,42 +1,39 @@
 #include "Symbol_Table.h"
 
-Symbol_Table::Symbol_Table(std::string *keys, int *values, int n)
-{
-
-	for (int i = 0; i < n; ++i){
-
-		this->_insert_symbol(keys[i], values[i]);
-	}
-
+Symbol_Table::Symbol_Table(){
+	scopes.push_back(std::map<std::string, oper_type>());
 }
 
+oper_type Symbol_Table::find_symbol(std::string s){
 
-int Symbol_Table::_insert_symbol(std::string id, int value)
-{
-	Symbol _temp_symbol;
+	std::map<std::string, oper_type>::iterator it;
 
-	std::map<std::string, Symbol>::iterator it;
-	it = table.find(id);
+	for (int i = scopes.size() - 1; i >= 0; --i){
+		it = scopes[i].find(s);
+		if (it != scopes[i].end()){
+			break;
+		}
+	}
 
-	if (it == table.end()){
-		_temp_symbol.type = value;
-
-		this->table.insert(std::pair<std::string, Symbol>(id, _temp_symbol));
-
-		return value;
-	} 
+	if (it != scopes.front().end()){
+		return it->second;
+	}
 	else {
-		return it->second.type;
+		return EMP;
 	}
 
 }
 
-int Symbol_Table::insert_symbol(std::string id)
-{
-	return _insert_symbol(id, ST_ID);
+int Symbol_Table::insert_symbol(std::string s, oper_type o){
+	scopes.back().insert(std::pair<std::string, oper_type>(s, o));
+	return 0;
 }
 
-void create_symbol_table(Symbol_Table &table){
-
-	table = Symbol_Table(inital_syms, inital_values, sizeof(inital_values) / sizeof(int));
+int Symbol_Table::increse_scope(){
+	scopes.push_back(std::map<std::string, oper_type>());
+	return 0;
+}
+int Symbol_Table::decrese_scope(){
+	scopes.pop_back();
+	return 0;
 }

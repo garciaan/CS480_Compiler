@@ -20,7 +20,7 @@ struct _mesg{
 } typedef mesg;
 
 static const std::string inital_syms[] = { "true", "false", "and", "or", "not", "bool",
-"int", "real", "string", "let", "if", "while", "sin", "cos", "tan",
+"int", "float", "string", "let", "if", "while", "sin", "cos", "tan",
 "stdout"
 };
 

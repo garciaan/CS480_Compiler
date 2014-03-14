@@ -1,5 +1,5 @@
 [
 	[let[[i int]]]
 	[:= i 3]
-	stdout[+ 3 i]
+	[stdout[+ 3 i]]
 ]
