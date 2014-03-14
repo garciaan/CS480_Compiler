@@ -116,5 +116,19 @@
 
 	$
 
+	#Variable tests
+
+	[let [[str string][i int][b bool][r real]]]
+	[:= str "hello"]
+	[:= i 3]
+	[:= b true]
+	[:= r 3.14]
+
+	[stdout str]
+	[stdout i]
+	[stdout b]
+	[stdout r]
+
+
 
 ]

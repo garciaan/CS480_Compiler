@@ -7,6 +7,7 @@
 #include <queue>
 #include <vector>
 #include <cmath>
+#include "Symbol_Table.h"
 #include "Token.h"
 #include "Lex.h"
 
@@ -18,24 +19,25 @@ private:
 
 	Lexer lex;
 	std::ifstream &source;
-	Symbol_Table &table;
 	std::string source_name;
 
+	std::string variables;
+
+	Symbol_Table table;
 	std::queue<mesg> errors;
 
-	bool fatal_error = false;
+	bool fatal_error;
 
 public:
 	//var type will not exist in the final implimentation but we use it here as a filler
-	enum oper_type { INT, REAL, STRING, BOOL, ERROR, EMP, EXT };
-
+	
 	typedef  struct _synth_return{
 		oper_type type;
 		std::string attr;
 	}synth_return;
 
 
-	Parser(std::ifstream &source, std::string source_name, Symbol_Table &table);
+	Parser(std::ifstream &source, std::string source_name);
 
 	std::string parse();
 
@@ -78,6 +80,8 @@ public:
 	synth_return type();
 
 	synth_return negop();
+
+	synth_return append_ID_let();
 
 	synth_return append_ID();
 

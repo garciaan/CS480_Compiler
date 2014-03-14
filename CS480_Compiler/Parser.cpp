@@ -2,7 +2,7 @@
 
 
 //Constructor
-Parser::Parser(std::ifstream &_source, std::string _source_name, Symbol_Table &_table) : source(_source), source_name(_source_name), table(_table), lex(_source, _table) {}
+Parser::Parser(std::ifstream &_source, std::string _source_name) : source(_source), source_name(_source_name), lex(_source), table() {}
 
 
 //beginning or our recursive desent 
@@ -66,7 +66,7 @@ std::string Parser::start(){
 		error("Code did not end with right bracket ']'. Inserting right bracket to continue parse.");
 	}
 
-	add << std::endl << ";" << std::endl << " main ";
+	add << std::endl << ";" << std::endl << "main ";
 
 	//add closing line to file
 	add << std::endl << "bye" << std::endl;
@@ -75,7 +75,7 @@ std::string Parser::start(){
 		error("Unprocessed input remaining after parse.");
 	}
 
-	return add.str();
+	return variables + "\n\n" +add.str();
 
 }
 
@@ -246,10 +246,8 @@ Parser::synth_return Parser::oper(){
 	}
 	else if (lex.peek_tag() == ID){
 
-		//synth.type = VAR; 
-		add << ((IdToken*)lex.peek())->get_id();
-
-		pop_lex(add);
+		synth = append_ID();
+		add << synth.attr;
 	}
 	else if (is_CONST(lex.peek_tag())){
 		synth = const_0();
@@ -274,9 +272,31 @@ Parser::synth_return Parser::oper_1(){
 	if (lex.peek_tag() == ASSIGN){
 		pop_lex(add);
 
+		synth_return id;
+		synth_return oper_0;
+
 		if (lex.peek_tag() == ID){
-			pop_lex(add);
-			synth = oper();
+			id = append_ID_let();
+			oper_0 = oper();
+
+			if ((oper_0.type == INT && id.type == INT) || (oper_0.type == BOOL && id.type == BOOL)){
+				add << oper_0.attr << id.attr << "! ";
+		}
+			else if (oper_0.type == INT && id.type == REAL){
+				add << oper_0.attr << "s>f " <<  id.attr << "f! ";
+	}
+			else if (oper_0.type == REAL && id.type == REAL){
+				add << oper_0.attr <<  id.attr << "f! ";
+			}
+			else if (oper_0.type == STRING && id.type == STRING){
+				add << oper_0.attr << id.attr << "2! ";
+			}
+			else {
+				error("Operand of type " + oper_to_string(oper_0.type) + " and variable of type " + oper_to_string(id.type) +
+					" have no defintion for assignment.");
+				fatal_error = true;
+				return synth;
+			}
 		}
 	}
 
@@ -361,7 +381,7 @@ Parser::synth_return Parser::oper_1(){
 
 		if (oper2.type == EMP){
 			if (oper1.type == REAL){
-				synth.type == REAL;
+				synth.type = REAL;
 				add << oper1.attr << "fnegate ";
 			}
 			else if (oper1.type == INT){
@@ -715,29 +735,50 @@ Parser::synth_return Parser::varlist(){
 	synth_return synth;
 	std::stringstream add;
 
-	//if (fatal_error) return synth;
+	if (fatal_error) return synth;
 
-	//if (lex.peek_tag() == L_BRACKET){
-	//	pop_lex(add);
-	//}
-	//else {
-	//	error("Missing left bracket. Inserting left bracket to continue parsing.");
-	//}
-	//
-	//synth = append_ID();
-	//add << synth.attr;
-	//add << type()
+	if (lex.peek_tag() == L_BRACKET){
+		pop_lex(add);
+	}
+	else {
+		error("Missing left bracket. Inserting left bracket to continue parsing.");
+	}
 
-	//if (lex.peek_tag() == R_BRACKET){
-	//	pop_lex(add);
-	//}
-	//else {
-	//	error("Syntax_error.");
-	//	fatal_error = true;
-	//}
+	synth_return name;
+	synth_return type_0;
 
-	//add << varlist_1();
+	name = append_ID_let();
+	name.attr.erase(name.attr.size() - 1);
+	type_0 = type();
+	switch (type_0.type){
+	case BOOL:
+	case INT:
+		add << "variable " << name.attr << " ";
+		break;
+	case REAL:
+		add << "fvariable " << name.attr << " ";
+		break;
+	case STRING:
+		add << "2variable " << name.attr << " ";
+		break;
+	}
 
+	//add checks for doubly defined variables here
+	table.insert_symbol(name.attr, type_0.type);
+
+	if (lex.peek_tag() == R_BRACKET){
+		pop_lex(add);
+	}
+	else {
+		error("Syntax_error.");
+		fatal_error = true;
+	}
+
+
+	add << varlist_1().attr;
+
+	variables += add.str();
+	synth.attr = "";
 	return synth;
 
 }
@@ -747,18 +788,18 @@ Parser::synth_return Parser::varlist_1(){
 	synth_return synth;
 	std::stringstream add;
 
-	//if (fatal_error) return synth;
+	if (fatal_error) return synth;
 
-	//if (lex.peek_tag() == R_BRACKET){
-	//	return "";
-	//}
-	//else if (lex.peek_tag() == L_BRACKET){
-	//	return varlist();
-	//}
-	//else {
-	//	error("Syntax_error.");
-	//	fatal_error = true;
-	//}
+	if (lex.peek_tag() == R_BRACKET){
+		return synth;
+	}
+	else if (lex.peek_tag() == L_BRACKET){
+		return varlist();
+	}
+	else {
+		error("Syntax_error.");
+		fatal_error = true;
+	}
 
 	return synth;
 
@@ -771,19 +812,59 @@ Parser::synth_return Parser::type(){
 
 	if (fatal_error) return synth;
 
-	if (lex.peek_tag() == BOOL_T || lex.peek_tag() == INT_T ||
-		lex.peek_tag() == REAL_T || lex.peek_tag() == STRING_T){
+
+	switch (lex.peek_tag()){
+	case BOOL_T:
+		synth.type = BOOL;
 		pop_lex(add);
-	}
-	else {
+		break;
+	case INT_T:
+		synth.type = INT;
+		pop_lex(add);
+		break;
+	case REAL_T:
+		synth.type = REAL;
+		pop_lex(add);
+		break;
+	case STRING_T:
+		synth.type = STRING;
+		pop_lex(add);
+		break;
+	default:
 		error("Syntax_error.");
 		fatal_error = true;
+		break;
 	}
 
 	synth.attr = add.str();
 	return synth;
 }
 
+
+
+Parser::synth_return Parser::append_ID_let(){
+
+	std::stringstream add;
+	synth_return synth;
+
+	if (lex.peek_tag() == ID){
+
+		std::string id = ((IdToken*)lex.peek())->get_id();
+
+		add << id + " ";
+		pop_lex(add);
+		synth.attr = add.str();
+
+		synth.type = table.find_symbol(id);
+
+		return synth;
+	}
+	else {
+		error("Syntax_error.");
+		fatal_error = true;
+		return synth;
+	}
+}
 
 Parser::synth_return Parser::append_ID(){
 
@@ -792,9 +873,22 @@ Parser::synth_return Parser::append_ID(){
 
 	if (lex.peek_tag() == ID){
 
-		//synth.type = VAR;
-		add << ((IdToken*)lex.peek())->get_id() + " ";
-		pop_lex(add);
+		synth = append_ID_let();
+		add << synth.attr;
+
+		switch (synth.type){
+		case BOOL:
+		case INT:
+			add << "@ ";
+			break;
+		case STRING:
+			add << "2@ ";
+			break;
+		case REAL:
+			add << "f@ ";
+			break;
+		}
+
 		synth.attr = add.str();
 		return synth;
 	}
@@ -806,6 +900,9 @@ Parser::synth_return Parser::append_ID(){
 }
 
 Parser::synth_return Parser::append_CONST(){
+
+	synth_return synth;
+
 	if (is_CONST(lex.peek_tag())){
 		return const_0();
 	}
@@ -813,6 +910,7 @@ Parser::synth_return Parser::append_CONST(){
 		error("Syntax_error.");
 		fatal_error = true;
 	}
+	return synth;
 	
 }
 
@@ -833,8 +931,12 @@ void Parser::error(std::string msg){
 
 void Parser::pop_lex(std::stringstream &str){
 	lex.pop();
-	while (lex.peek_tag() == LINE_END){
+
+	if (lex.peek_tag() == LINE_END){
 		str << std::endl;
+	}
+
+	while (lex.peek_tag() == LINE_END){
 		lex.pop();
 	}
 }

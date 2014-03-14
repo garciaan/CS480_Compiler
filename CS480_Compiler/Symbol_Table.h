@@ -3,48 +3,29 @@
 #ifndef SYMTAB_H
 #define SYMTAB_H
 
-// Symbol Table Types
-#define  ST_ID -1
-
+#include <vector>
 #include <string>
 #include <map>
-#include "Token.h"
 
-struct _symbol{
-
-	int type;
-
-}typedef Symbol;
-
-//setup symbol table
-static std::string inital_syms[] = { "true", "false", "and", "or", "not", "bool",
-"int", "real", "string", "let", "if", "while", "sin", "cos", "tan",
-"stdout"
-};
-
-static int inital_values[] = { TRUE, FALSE, AND, OR, NOT, BOOL_T, INT_T, REAL_T,
-STRING_T, LET, IF, WHILE, SIN, COS, TAN, STDOUT };
-
+enum oper_type { INT, REAL, STRING, BOOL, ERROR, EMP, EXT };
 
 class Symbol_Table{
 
 private:
 
-	std::map<std::string, Symbol> table;
-
-	int _insert_symbol(std::string id, int value);
+	std::vector<std::map<std::string, oper_type>> scopes;
 
 public:
 
-	Symbol_Table(std::string *keys, int *values, int n);
-	Symbol_Table(){}
+	Symbol_Table();
 
-	int insert_symbol(std::string id);
+	oper_type find_symbol(std::string);
+	int insert_symbol(std::string, oper_type);
+
+	int increse_scope();
+	int decrese_scope();
 
 };
-
-
-void create_symbol_table(Symbol_Table &table);
 
 
 #endif // SYMTAB_H

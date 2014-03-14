@@ -11,7 +11,7 @@
 #include <sstream>
 
 #include "Token.h"
-#include "Symbol_Table.h"
+
 
 struct _mesg{
 	int line;
@@ -19,18 +19,26 @@ struct _mesg{
 	std::string msg;
 } typedef mesg;
 
+static const std::string inital_syms[] = { "true", "false", "and", "or", "not", "bool",
+"int", "float", "string", "let", "if", "while", "sin", "cos", "tan",
+"stdout"
+};
+
+static const int inital_values[] = { TRUE, FALSE, AND, OR, NOT, BOOL_T, INT_T, REAL_T,
+STRING_T, LET, IF, WHILE, SIN, COS, TAN, STDOUT };
 
 
 class Lexer
 {
 public:
-	Lexer(std::istream &_source, Symbol_Table &_table) : source(_source), table(_table){}
+	Lexer(std::istream &_source) : source(_source){}
 	~Lexer();
 
 	Token *peek();
 	int peek_tag();
 	void pop();
 	bool source_empty();
+	int is_keyword(std::string guess);
 	int get_loc();
 
 	int tokenize(int num_tokens);
@@ -41,10 +49,11 @@ public:
 private:
 
 	std::istream &source;
-	Symbol_Table &table;
 	std::queue<Token*> queue; 
 	std::queue<mesg> errors;
 	std::queue<mesg> warnings;
+
+
 
 };
 

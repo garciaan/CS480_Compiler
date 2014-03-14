@@ -63,6 +63,20 @@ int Lexer::get_loc(){
 	return source.tellg();
 }
 
+
+int Lexer::is_keyword(std::string guess){
+
+	int length = sizeof(inital_syms) / sizeof(string);
+
+	for (int i = 0; i < length; ++i){
+		if (guess == inital_syms[i]){
+			return inital_values[i];
+		}
+	}
+
+	return -1;
+}
+
 // returns the number of tokens created, or -1 if non were
 int Lexer::tokenize(int _num_tokens){
 
@@ -105,7 +119,7 @@ int Lexer::tokenize(int _num_tokens){
 
 			//insert id into symbol table unless we have 
 			//a keyword which we then put into the correct token
-			int attempt = table.insert_symbol(value);
+			int attempt = is_keyword(value);
 
 			if (attempt < 0){
 				queue.push(new IdToken(value, loc));
@@ -119,19 +133,19 @@ int Lexer::tokenize(int _num_tokens){
 		}
 
 		//numbers
-		else if (isdigit(source.peek()) || source.peek() == '.' || source.peek() == '-'){
+		else if (isdigit(source.peek()) || source.peek() == '.'){
 
-			if (source.peek() == '-'){
-				source.ignore();
-				if (source.peek() == ' '){
-					queue.push(new Token(MINUS, loc));
-					++cur_tokens;
-					continue;
-				}
-				else {
-					value.append(1, '-');
-				}
-			}
+			//if (source.peek() == '-'){
+			//	source.ignore();
+			//	if (source.peek() == ' '){
+			//		queue.push(new Token(MINUS, loc));
+			//		++cur_tokens;
+			//		continue;
+			//	}
+			//	else {
+			//		value.append(1, '-');
+			//	}
+			//}
 
 
 			//while we have just digits, get the digits
