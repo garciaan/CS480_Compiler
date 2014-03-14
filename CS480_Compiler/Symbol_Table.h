@@ -6,8 +6,9 @@
 #include <vector>
 #include <string>
 #include <map>
+#include <sstream>
 
-enum oper_type { INT, REAL, STRING, BOOL, ERROR, EMP, EXT };
+enum oper_type { INT, FLOAT, STRING, BOOL, ERROR, EMP, USD, EXT };
 
 typedef struct _var_info{
 	oper_type type;
@@ -23,8 +24,7 @@ private:
 
 	var_info _find_symbol(std::string, int* level);
 
-
-	static int var_count;
+	int var_count;
 
 public:
 

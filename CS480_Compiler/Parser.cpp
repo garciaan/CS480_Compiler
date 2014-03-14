@@ -21,7 +21,6 @@ std::string Parser::parse(){
 
 	add << start();
 
-
 	if (!errors.empty()){
 		std::cout << "ERRORS:" << std::endl;
 
@@ -140,7 +139,11 @@ std::string Parser::s_2(){
 
 	if (lex.peek_tag() == L_BRACKET || is_CONST(lex.peek_tag()) || lex.peek_tag() == ID){
 		
+		table.increse_scope();
+
 		add << s();
+
+		table.decrese_scope();
 
 		if (lex.peek_tag() == R_BRACKET){
 			pop_lex(add);
@@ -268,7 +271,6 @@ Parser::synth_return Parser::oper_1(){
 
 	if (fatal_error) return synth;
 
-	//we are going to ignore this step for now
 	if (lex.peek_tag() == ASSIGN){
 		pop_lex(add);
 
@@ -282,10 +284,10 @@ Parser::synth_return Parser::oper_1(){
 			if ((oper_0.type == INT && id.type == INT) || (oper_0.type == BOOL && id.type == BOOL)){
 				add << oper_0.attr << id.attr << "! ";
 		}
-			else if (oper_0.type == INT && id.type == REAL){
+			else if (oper_0.type == INT && id.type == FLOAT){
 				add << oper_0.attr << "s>f " <<  id.attr << "f! ";
 	}
-			else if (oper_0.type == REAL && id.type == REAL){
+			else if (oper_0.type == FLOAT && id.type == FLOAT){
 				add << oper_0.attr <<  id.attr << "f! ";
 			}
 			else if (oper_0.type == STRING && id.type == STRING){
@@ -327,16 +329,20 @@ Parser::synth_return Parser::oper_1(){
 				synth.type = INT;
 				add << oper1.attr << "s>f " << oper2.attr << "s>f " << "f** f>s ";
 			}
-			else if (oper1.type == REAL && oper2.type == REAL){
-				synth.type = is_log_BINOP(bin_op) ? BOOL : REAL;
+			else if (oper1.type == STRING && oper2.type == STRING && bin_op == PLUS){
+				synth.type = STRING;
+				add << oper1.attr << "pad place " << oper2.attr << "pad +place pad count ";
+			}
+			else if (oper1.type == FLOAT && oper2.type == FLOAT){
+				synth.type = is_log_BINOP(bin_op) ? BOOL : FLOAT;
 				add << oper1.attr << oper2.attr << "f" << Token::tag_to_input(bin_op) << " ";
 			}
-			else if (oper1.type == REAL && oper2.type == INT){
-				synth.type = is_log_BINOP(bin_op) ? BOOL : REAL;
+			else if (oper1.type == FLOAT && oper2.type == INT){
+				synth.type = is_log_BINOP(bin_op) ? BOOL : FLOAT;
 				add << oper1.attr << oper2.attr << "s>f " << "f" << Token::tag_to_input(bin_op) << " ";
 			}
-			else if (oper1.type == INT && oper2.type == REAL){
-				synth.type = is_log_BINOP(bin_op) ? BOOL : REAL;
+			else if (oper1.type == INT && oper2.type == FLOAT){
+				synth.type = is_log_BINOP(bin_op) ? BOOL : FLOAT;
 				add << oper1.attr << "s>f " << oper2.attr << "f" << Token::tag_to_input(bin_op) << " ";
 			}
 			else if (oper1.type == INT && oper2.type == INT){
@@ -364,11 +370,11 @@ Parser::synth_return Parser::oper_1(){
 			add << oper1.attr << "invert ";
 		}
 		else if (oper1.type == INT){
-			synth.type = REAL;
+			synth.type = FLOAT;
 			add << oper1.attr << "s>f " << Token::tag_to_input(un_op) << " ";
 		}
-		else if (oper1.type == REAL){
-			synth.type = REAL;
+		else if (oper1.type == FLOAT){
+			synth.type = FLOAT;
 			add << oper1.attr << Token::tag_to_input(un_op) << " ";
 		}
 
@@ -380,8 +386,8 @@ Parser::synth_return Parser::oper_1(){
 		synth_return oper2 = negop();
 
 		if (oper2.type == EMP){
-			if (oper1.type == REAL){
-				synth.type = REAL;
+			if (oper1.type == FLOAT){
+				synth.type = FLOAT;
 				add << oper1.attr << "fnegate ";
 			}
 			else if (oper1.type == INT){
@@ -390,16 +396,16 @@ Parser::synth_return Parser::oper_1(){
 			}
 		}
 		else {
-			if (oper1.type == REAL && oper2.type == REAL){
-				synth.type = REAL;
+			if (oper1.type == FLOAT && oper2.type == FLOAT){
+				synth.type = FLOAT;
 				add << oper1.attr << oper2.attr << "f- ";
 			}
-			else if (oper1.type == REAL && oper2.type == INT){
-				synth.type = REAL;
+			else if (oper1.type == FLOAT && oper2.type == INT){
+				synth.type = FLOAT;
 				add << oper1.attr << oper2.attr << "s>f f- ";
 			}
-			else if (oper1.type == INT && oper2.type == REAL){
-				synth.type = REAL;
+			else if (oper1.type == INT && oper2.type == FLOAT){
+				synth.type = FLOAT;
 				add << oper1.attr << "s>f " << oper2.attr << "f- ";
 			}
 			else if (oper1.type == INT && oper2.type == INT){
@@ -505,7 +511,11 @@ Parser::synth_return Parser::stmt_1(){
 			return synth;
 		}
 		add << "begin " << synth.attr << "while ";
+
+		table.increse_scope();
 		synth = exprlist();
+		table.decrese_scope();
+
 		add << synth.attr << "repeat ";
 	}
 	else if (lex.peek_tag() == LET){
@@ -539,7 +549,7 @@ Parser::synth_return Parser::stmt_1(){
 		case STRING:
 			add << "type ";
 			break;
-		case REAL:
+		case FLOAT:
 			add << "f. ";
 			break;
 		case INT:
@@ -617,7 +627,7 @@ Parser::synth_return Parser::const_0(){
 		add << ((IntToken*)lex.peek())->get_int() << " ";
 	}
 	else if (lex.peek_tag() == REAL_L){
-		synth.type = REAL;
+		synth.type = FLOAT;
 		double val = ((RealToken*)lex.peek())->get_real();
 
 		add << std::fixed
@@ -744,27 +754,39 @@ Parser::synth_return Parser::varlist(){
 		error("Missing left bracket. Inserting left bracket to continue parsing.");
 	}
 
-	synth_return name;
+	var_info var;
 	synth_return type_0;
 
-	name = append_ID_let();
-	name.attr.erase(name.attr.size() - 1);
-	type_0 = type();
-	switch (type_0.type){
-	case BOOL:
-	case INT:
-		add << "variable " << name.attr << " ";
-		break;
-	case REAL:
-		add << "fvariable " << name.attr << " ";
-		break;
-	case STRING:
-		add << "2variable " << name.attr << " ";
-		break;
+	//get name spedificly here
+
+	if (lex.peek_tag() == ID){
+
+		std::string id = ((IdToken*)lex.peek())->get_id();
+		pop_lex(add);
+		type_0 = type();
+
+		var = table.insert_symbol(id, type_0.type);
+
+		switch (type_0.type){
+		case BOOL:
+		case INT:
+			add << "variable " << var.name << " ";
+			break;
+		case FLOAT:
+			add << "fvariable " << var.name << " ";
+			break;
+		case STRING:
+			add << "2variable " << var.name << " ";
+			break;
+		}
+
+	}
+	else {
+		error("Syntax Error");
+		fatal_error = true;
 	}
 
-	//add checks for doubly defined variables here
-	table.insert_symbol(name.attr, type_0.type);
+
 
 	if (lex.peek_tag() == R_BRACKET){
 		pop_lex(add);
@@ -823,7 +845,7 @@ Parser::synth_return Parser::type(){
 		pop_lex(add);
 		break;
 	case REAL_T:
-		synth.type = REAL;
+		synth.type = FLOAT;
 		pop_lex(add);
 		break;
 	case STRING_T:
@@ -846,16 +868,24 @@ Parser::synth_return Parser::append_ID_let(){
 
 	std::stringstream add;
 	synth_return synth;
+	var_info result;
 
 	if (lex.peek_tag() == ID){
 
 		std::string id = ((IdToken*)lex.peek())->get_id();
 
-		add << id + " ";
+		result = table.find_symbol(id);
+
+		if (result.type == EMP){
+			error("Undeclared Variable " + id + ".");
+			fatal_error = true;
+			return synth;
+		}
+
+		add << result.name + " ";
 		pop_lex(add);
 		synth.attr = add.str();
-
-		synth.type = table.find_symbol(id);
+		synth.type = result.type;
 
 		return synth;
 	}
@@ -884,7 +914,7 @@ Parser::synth_return Parser::append_ID(){
 		case STRING:
 			add << "2@ ";
 			break;
-		case REAL:
+		case FLOAT:
 			add << "f@ ";
 			break;
 		}
@@ -976,7 +1006,7 @@ std::string Parser::oper_to_string(oper_type op){
 	switch (op){
 	case INT:
 		return "int";
-	case REAL:
+	case FLOAT:
 		return "real";
 	case STRING:
 		return "string";

@@ -53,5 +53,8 @@
       <Filter>Resource Files</Filter>
     </Text>
     <Text Include="Fail_Test.txt" />
+    <Text Include="var_test.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
   </ItemGroup>
 </Project>

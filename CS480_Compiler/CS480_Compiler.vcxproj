@@ -80,6 +80,7 @@
     <Text Include="Fail_Test.txt" />
     <Text Include="Fail_Test_1.txt" />
     <Text Include="Pass_Test.txt" />
+    <Text Include="var_test.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
