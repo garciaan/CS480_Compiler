@@ -43,7 +43,7 @@ var_info Symbol_Table::insert_symbol(std::string s, oper_type o){
 }
 
 int Symbol_Table::increse_scope(){
-	scopes.push_back(std::map<std::string, oper_type>());
+	scopes.push_back(std::map<std::string, var_info>());
 	return 0;
 }
 int Symbol_Table::decrese_scope(){
