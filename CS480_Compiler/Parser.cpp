@@ -293,7 +293,7 @@ Parser::synth_return Parser::oper_1(){
 		if (is_bool_BINOP(bin_op)){
 			if (oper1.type == BOOL && oper2.type == BOOL){
 				synth.type = BOOL;
-				add << oper1.attr << oper2.attr;
+				add << oper1.attr << oper2.attr << Token::tag_to_string(bin_op);
 			}
 			else {
 				error("Operands of type " + oper_to_string(oper1.type) + " and " + oper_to_string(oper2.type) +
