@@ -19,6 +19,11 @@ std::string Parser::parse(){
 	// process all input
 	lex.tokenize(0);
 
+	funcs.push(": 2strcnt ( c-addr1 u1 c-addr2 u2 -- c-addr1 u1 c-addr2 u2 u1+u2 ) rot 2dup + >r -rot r> ;");
+	funcs.push(": 2stradd ( c-addr1 u1 c-addr2 u2 -- c-addr3 u1+u2 ) 2swap 2strcnt here swap dup allot >r dup >r swap dup "
+				 ">r move r> r> dup >r + swap move r> r> ;");
+
+
 	add << start();
 
 	if (!errors.empty()){
@@ -74,7 +79,20 @@ std::string Parser::start(){
 		error("Unprocessed input remaining after parse.");
 	}
 
-	return variables + "\n\n" +add.str();
+	std::stringstream add2;
+
+	while (!funcs.empty()){
+		add2 << funcs.front() << std::endl;
+		funcs.pop();
+	}
+	while (!vars.empty()){
+		add2 << vars.front() << std::endl;
+		vars.pop();
+	}
+
+	add2 << std::endl << std::endl;
+
+	return add2.str() + add.str();
 
 }
 
@@ -332,7 +350,7 @@ Parser::synth_return Parser::oper_1(){
 			}
 			else if (oper1.type == STRING && oper2.type == STRING && bin_op == PLUS){
 				synth.type = STRING;
-				add << oper1.attr << "pad place " << oper2.attr << "pad +place pad count ";
+				add << oper1.attr << oper2.attr << "2stradd ";
 			}
 			else if (oper1.type == FLOAT && oper2.type == FLOAT){
 				synth.type = is_log_BINOP(bin_op) ? BOOL : FLOAT;
@@ -787,6 +805,8 @@ Parser::synth_return Parser::varlist(){
 			break;
 		}
 
+		vars.push(add.str());
+
 	}
 	else {
 		error("Syntax Error");
@@ -803,10 +823,8 @@ Parser::synth_return Parser::varlist(){
 		fatal_error = true;
 	}
 
+	varlist_1();
 
-	add << varlist_1().attr;
-
-	variables += add.str();
 	synth.attr = "";
 	return synth;
 

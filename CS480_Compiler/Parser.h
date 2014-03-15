@@ -25,6 +25,8 @@ private:
 
 	Symbol_Table table;
 	std::queue<mesg> errors;
+	std::queue<std::string> funcs;
+	std::queue<std::string> vars;
 
 	bool fatal_error;
 
