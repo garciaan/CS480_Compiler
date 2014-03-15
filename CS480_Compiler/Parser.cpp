@@ -257,7 +257,8 @@ Parser::synth_return Parser::oper(){
 		add << synth.attr;
 	}
 	else {
-		synth.type = ERROR;
+		error("Syntax error.");
+		fatal_error = true;
 	}
 
 	synth.attr = add.str();
@@ -315,7 +316,7 @@ Parser::synth_return Parser::oper_1(){
 		if (is_bool_BINOP(bin_op)){
 			if (oper1.type == BOOL && oper2.type == BOOL){
 				synth.type = BOOL;
-				add << oper1.attr << oper2.attr << Token::tag_to_string(bin_op);
+				add << oper1.attr << oper2.attr << Token::tag_to_string(bin_op) << " ";
 			}
 			else {
 				error("Operands of type " + oper_to_string(oper1.type) + " and " + oper_to_string(oper2.type) +
@@ -767,6 +768,12 @@ Parser::synth_return Parser::varlist(){
 
 		var = table.insert_symbol(id, type_0.type);
 
+		if (var.type == USD){
+			error("Redefinition of variable " + id + " to different basic type.");
+			fatal_error = true;
+			return synth;
+		}
+
 		switch (type_0.type){
 		case BOOL:
 		case INT:
@@ -861,8 +868,6 @@ Parser::synth_return Parser::type(){
 	synth.attr = add.str();
 	return synth;
 }
-
-
 
 Parser::synth_return Parser::append_ID_let(){
 

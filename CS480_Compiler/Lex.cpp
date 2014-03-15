@@ -135,19 +135,6 @@ int Lexer::tokenize(int _num_tokens){
 		//numbers
 		else if (isdigit(source.peek()) || source.peek() == '.'){
 
-			//if (source.peek() == '-'){
-			//	source.ignore();
-			//	if (source.peek() == ' '){
-			//		queue.push(new Token(MINUS, loc));
-			//		++cur_tokens;
-			//		continue;
-			//	}
-			//	else {
-			//		value.append(1, '-');
-			//	}
-			//}
-
-
 			//while we have just digits, get the digits
 			if (isdigit(source.peek())){
 				do{

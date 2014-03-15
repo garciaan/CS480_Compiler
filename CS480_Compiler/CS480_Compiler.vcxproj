@@ -78,9 +78,16 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="Fail_Test.txt" />
-    <Text Include="Fail_Test_1.txt" />
-    <Text Include="Pass_Test.txt" />
-    <Text Include="var_test.txt" />
+    <Text Include="fail2.in" />
+    <Text Include="fail1.in" />
+    <Text Include="fail3.in" />
+    <Text Include="pass.in" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="proftest3.in" />
+    <None Include="proftest4.in" />
+    <None Include="proftest5.in" />
+    <None Include="proftestec.in" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

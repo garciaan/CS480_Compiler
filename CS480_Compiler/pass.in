@@ -19,9 +19,15 @@
 		[stdout " ELSE"]
 	]
 
+	$
+	
+	[let[[i int]]]
+	[:= i 10]
+	
 	[while
-		[< 3 2]
-		[stdout "loop"]
+		[< 0 i]
+		[stdout i]
+		[:= i [- i 1]]
 	]
 
 	$
@@ -116,19 +122,43 @@
 
 	$
 
-	#Variable tests
+	#String cat
 
-	[let [[str string][i int][b bool][r real]]]
-	[:= str "hello"]
-	[:= i 3]
-	[:= b true]
-	[:= r 3.14]
+	[let[[k string]]]
+	[:= k "Hello"]
+	[stdout [+ k " there!"]]
 
-	[stdout str]
-	[stdout i]
-	[stdout b]
-	[stdout r]
+	$
+	
+	#variable tests
+	
+	[let [[x int] [y int] [z int][a int]]]
+	[:= x 5]
+	[:= y 10]
+	[:= z 15]
+	[:= a 100]
+	[
+		[let [[x int] [y int] [z int]]]
+		[:= x [-3]]
+		[:= y [-6]]
+		[:= z [-9]]
+		[stdout x]
+		[stdout y]
+		[stdout z]
+		[stdout a]
 
+	]
 
+	[stdout x]
+	[stdout y]
+	[stdout z]
+	[stdout a]
+	
+	$
+	
+	#from proftest3
+	
+	[stdout [<=10.1.1]]
+	[-3.14e-159]
 
 ]
