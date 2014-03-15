@@ -161,4 +161,10 @@
 	[stdout [<=10.1.1]]
 	[-3.14e-159]
 
+	#from milestone
+
+	[if [> 2 3] [stdout "yes"]]
+	[if [> 2 3] [stdout "yes"] [stdout "no"]]
+	[[let [[x int]]] [:= x 10] [stdout [- 20 x]]]
+
 ]
